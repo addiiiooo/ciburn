@@ -1,0 +1,10 @@
+name: poll
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: curl -fsS https://example.com/health

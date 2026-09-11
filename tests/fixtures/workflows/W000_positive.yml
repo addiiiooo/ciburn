@@ -1,0 +1,5 @@
+name: broken
+on: [push
+jobs:
+  a:
+    runs-on: ubuntu-latest

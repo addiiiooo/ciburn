@@ -273,7 +273,8 @@ def billable_minutes(seconds: float | int) -> int:
     """
     if math.isnan(seconds) or seconds <= 0:
         return 0
-    return math.ceil(seconds / 60.0)
+    # any positive duration bills at least one minute (guards float underflow too)
+    return max(1, math.ceil(seconds / 60.0))
 
 
 def rounding_waste_seconds(seconds: float | int) -> float:

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "W004",
+    "job": null,
+    "severity": "low"
+  },
+  {
+    "rule": "W010",
+    "job": "e2e",
+    "severity": "low"
+  }
+]
