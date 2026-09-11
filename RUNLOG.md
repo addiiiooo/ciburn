@@ -1,9 +1,14 @@
 # RUNLOG.md
 
+Timestamps are the UTC commit times from `git log` (the only clock this log
+has observed). An earlier draft carried guessed times for Gates 1–3; they were
+corrected on 2026-09-11 18:58 UTC and guessed values are a target class of the
+adversarial review (Gate 10).
+
 Gate-by-gate log. Written so that the next phase can be executed by someone who
 has read nothing else. Newest at the bottom.
 
-## Gate 1 — Phase 0 research (2026-09-11 18:00–19:00 UTC)
+## Gate 1 — Phase 0 research (committed 2026-09-11 18:13 UTC, commit c7bd9df)
 
 **Built:** `RESEARCH.md`, `DECISIONS.md` (D001–D008), `src/ciburn/data/pricing.yaml`
 (three models, 35 SKUs each, label→SKU regexes, limits, quotas, rounding rule),
@@ -28,7 +33,7 @@ scheduled runs fail".
 API token is obtained per-command with
 `git credential fill` (see D001) and exported as `GITHUB_TOKEN` in-process only.
 
-## Gate 2 — Skeleton, packaging, pricing engine, CI (2026-09-11 19:20 UTC)
+## Gate 2 — Skeleton, packaging, pricing engine, CI (committed 2026-09-11 18:19 UTC, commit 7af7896)
 
 **Built:** `pyproject.toml` (hatchling, `ciburn` script, dev dependency group,
 ruff/mypy strict/pytest/coverage config), `src/ciburn/{__init__,cli,pricing}.py`,
@@ -46,7 +51,7 @@ monotonicity and the 0/1/59/60/61-second rounding boundaries.
 **Remains:** static analyzer (Gate 3), history ingestion (Gate 4), join and
 reporters (Gate 6), fix + action (Gate 7), corpus (Gate 8), hardening.
 
-## Gate 3 — Static analyzer (2026-09-11 20:10 UTC)
+## Gate 3 — Static analyzer (committed 2026-09-11 18:29 UTC, commit b315d87)
 
 **Built:** `workflow.py` (parser: `on` forms incl. PyYAML's `True` key, matrix
 leg counting, `runs-on` resolution, API-name matching, job line numbers),
@@ -70,3 +75,30 @@ known and has docs/ or ≥3 markdown files.
 
 **Remains:** history ingestion (Gate 4), history rules + join (Gate 6),
 reporters, CLI commands, fix, action, corpus.
+
+## Gate 4 — History layer (committed 2026-09-11 18:35 UTC, commit 3a9b750)
+
+**Built:** `history/client.py` (httpx client: auth from env, User-Agent, API
+version header, Link pagination with an `on_page` hook, primary/secondary
+rate-limit sleeps, 5xx/network backoff, injectable transport/sleep/clock),
+`history/store.py` (SQLite schema v1; repos, workflows, workflow_files, runs,
+jobs, steps, commits, timings, fetch_state), `history/ingest.py` (incremental
+and resumable; records the API `total_count` of runs in the window so
+truncated listings can be reported honestly; deterministic run sampling for
+the corpus), `history/view.py` (typed, priced `HistoryView`, `Totals`,
+config-job matching by API job name), `tests/fake_github.py` (in-memory fake
+API served through `httpx.MockTransport`).
+
+**Verified:** 172 tests pass; history package coverage 89–100 %; zero network
+calls in the unit suite.
+
+**Corpus scan launched** at 2026-09-11 18:37 UTC (`scripts/corpus_scan.py`,
+50 repos per cell, 10 languages × 4 star buckets, working directory `corpus/`
+which is git-ignored). It checkpoints itself; `corpus/scan.log` and
+`corpus/progress.json` show progress. Expected duration several hours. The
+token came from the keychain (D001) and exists only in that process's
+environment.
+
+**Remains:** Gate 5 (already covered by the pricing engine in Gate 2; property
+tests exist), Gate 6 join + history rules + reporters + CLI, Gate 7 fix +
+action, Gate 8 corpus report (blocked on the scan), Gates 9–12.

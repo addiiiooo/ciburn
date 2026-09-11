@@ -39,3 +39,6 @@ scratch/
 .idea/
 .vscode/
 *.swp
+
+# corpus scan working directory (raw SQLite + logs); the published dataset lives in dataset/
+corpus/

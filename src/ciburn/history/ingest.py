@@ -38,6 +38,7 @@ class IngestResult:
     default_branch: str
     since: datetime
     runs_seen: int = 0
+    runs_total_in_window: int = 0
     runs_jobs_fetched: int = 0
     jobs_seen: int = 0
     commits_fetched: int = 0
@@ -105,12 +106,19 @@ def ingest(
 
     # runs
     extra = {"event": opts.events_filter[0]} if len(opts.events_filter) == 1 else None
+    totals: list[int] = []
+
+    def _on_page(page: Any) -> None:
+        if not totals and isinstance(page, dict) and "total_count" in page:
+            totals.append(int(page["total_count"]))
+
     runs_iter = client.list_runs(
         owner,
         repo,
         created_since=since.strftime("%Y-%m-%d"),
         max_pages=opts.max_run_pages,
         extra=extra,
+        on_page=_on_page,
     )
     batch: list[dict[str, Any]] = []
     for run in runs_iter:
@@ -126,10 +134,17 @@ def ingest(
         store.upsert_runs(repo_id, batch)
         result.runs_seen += len(batch)
         progress("runs", {"seen": result.runs_seen})
+    result.runs_total_in_window = totals[0] if totals else result.runs_seen
     store.set_state(
         repo_id,
         "last_ingest",
-        {"at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "days": opts.days, "since": since_iso},
+        {
+            "at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "days": opts.days,
+            "since": since_iso,
+            "runs_total_in_window": result.runs_total_in_window,
+            "runs_fetched": result.runs_seen,
+        },
     )
 
     # jobs (resumable: only runs not yet fetched, or fetched while still running)

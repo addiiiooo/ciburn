@@ -205,8 +205,12 @@ class GitHubClient:
         key: str | None = None,
         per_page: int = 100,
         max_pages: int | None = None,
+        on_page: Callable[[Any], None] | None = None,
     ) -> Iterator[Any]:
-        """Yield items across pages. ``key`` is the JSON key holding the list."""
+        """Yield items across pages. ``key`` is the JSON key holding the list.
+
+        ``on_page`` receives each page's parsed JSON (e.g. to read ``total_count``).
+        """
         params = dict(params or {})
         params.setdefault("per_page", per_page)
         url: str | None = path
@@ -215,6 +219,8 @@ class GitHubClient:
             page += 1
             resp = self.request_raw("GET", url, params if page == 1 else None)
             data = resp.json()
+            if on_page is not None:
+                on_page(data)
             items = data[key] if key else data
             yield from items
             if max_pages is not None and page >= max_pages:
@@ -240,12 +246,17 @@ class GitHubClient:
         created_since: str | None = None,
         max_pages: int | None = None,
         extra: dict[str, Any] | None = None,
+        on_page: Callable[[Any], None] | None = None,
     ) -> Iterator[Any]:
         params: dict[str, Any] = dict(extra or {})
         if created_since:
             params["created"] = f">={created_since}"
         return self.paginate(
-            f"/repos/{owner}/{repo}/actions/runs", params, key="workflow_runs", max_pages=max_pages
+            f"/repos/{owner}/{repo}/actions/runs",
+            params,
+            key="workflow_runs",
+            max_pages=max_pages,
+            on_page=on_page,
         )
 
     def list_jobs(

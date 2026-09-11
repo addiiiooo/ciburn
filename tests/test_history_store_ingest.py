@@ -134,6 +134,8 @@ def test_ingest_options_limits_and_warnings() -> None:
         now=NOW,
     )
     assert res.runs_seen == 2
+    assert res.runs_total_in_window == 5
+    assert store.get_state(res.repo_id, "last_ingest")["runs_total_in_window"] == 5
     assert res.runs_jobs_fetched == 1
     assert any("event=push" in r for r in fake.requests)
     assert store.get_state(res.repo_id, "layout") == {
