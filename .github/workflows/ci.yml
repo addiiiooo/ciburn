@@ -76,3 +76,27 @@ jobs:
           uv venv /tmp/clean --python 3.12
           uv pip install --python /tmp/clean/bin/python dist/*.whl
           /tmp/clean/bin/ciburn --version
+
+  dogfood:
+    name: ciburn audits its own CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync
+      - name: audit this repository (fails on any medium+ finding)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          uv run ciburn audit --path . --repo "${{ github.repository }}" --days 30
+          --format md --output ciburn-report.md --fail-on medium
+      - name: publish the report to the job summary
+        if: always()
+        run: cat ciburn-report.md >> "$GITHUB_STEP_SUMMARY"

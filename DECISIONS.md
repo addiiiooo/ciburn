@@ -80,3 +80,33 @@ identified from the API; guessing a price would be fabrication.
 **Decision:** public repos are free on standard runners, so every dollar figure
 in REPORT.md is "what this usage would cost at private-repository list price".
 The report never presents these as bills anyone paid.
+
+## D009 — `fix` prints a diff by default; behaviour-changing patches need `--rules`
+
+**Decision:** `ciburn fix` prints a unified diff (apply with `git apply`);
+`--write` edits files in place; `--output` saves the patch. Patches that change
+behaviour rather than cost exposure (W010 draft guard, W007 `ubuntu-slim`) are
+marked `safe: false` and are only applied when the rule is named explicitly.
+Edits are text-based (no YAML round-trip) and verified by re-parsing.
+**Why:** an unreviewable reformatting diff or a silent semantic change would
+cost more trust than it saves.
+
+## D010 — `audit --fail-on` defaults to `none`
+
+**Decision:** exit 0 by default; CI gates opt in with `--fail-on medium` (the
+repository's own dogfood job does). Exit 2 is reserved for errors.
+**Why:** a first run on a real repository always has findings; failing by
+default would train people to ignore the exit code.
+
+## D011 — H003 only considers jobs that gate code changes
+
+**Decision:** H003 (never failed, candidate for sampling) skips groups where
+fewer than half the jobs ran on push/pull_request events, so scheduled
+maintenance jobs (issue locking, stale bots) are not called "gates".
+
+## D012 — History-driven W005 for small matrices
+
+**Decision:** the static W005 needs ≥6 legs or duplicates. When history shows
+per-job rounding is ≥25 % of a matrix job's billed minutes, the join emits a
+measured W005 regardless of leg count. Rounding is the load-bearing 2026
+insight; a 4-leg matrix of 70-second jobs deserves the finding.

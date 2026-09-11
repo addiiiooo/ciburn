@@ -102,3 +102,26 @@ environment.
 **Remains:** Gate 5 (already covered by the pricing engine in Gate 2; property
 tests exist), Gate 6 join + history rules + reporters + CLI, Gate 7 fix +
 action, Gate 8 corpus report (blocked on the scan), Gates 9–12.
+
+## Gates 6 and 7 — join, history rules, reporters, CLI, fix, action
+
+**Built:** `join.py` (measurers for W001–W010, W012 plus a history-driven
+W005), `rules/history_rules.py` (H001–H009), `audit.py` (orchestration,
+git-remote detection, degraded modes), `report/` (terminal via rich, markdown,
+json, html), `cli.py` (`audit`, `price`, `fix`, `rules`, `models`),
+`pricecmd.py`, `fix.py` (text-based patching with re-parse verification),
+`action.yml` (composite action, PR comment via `gh`), `scripts/render_demo.py`,
+`CHANGELOG.md`, `CONTRIBUTING.md`, issue/PR templates, dogfood CI job
+(`--fail-on medium` on this repository's own history).
+
+**Verified:** 200 tests pass; ruff, ruff format, mypy --strict clean; coverage
+of `ciburn.rules` + `ciburn.pricing` + `ciburn.join` is 96.9 % (CI floor 90 %).
+A live audit of `pallets/flask --days 30` ran end to end (61 runs, 217 jobs)
+and surfaced real findings: 69 % of billed minutes are per-job rounding, and
+27 of 30 scheduled `lock.yaml` runs re-tested an unchanged commit. The
+`analyzer.py` module from Gate 3 was removed (superseded by `audit.py`).
+
+**Remains:** Gate 8 corpus report (scan running), Gate 9 clean-room install
+and three-repository verification, README with real output, demo SVG, live
+integration test, secret scan, Gate 10 adversarial review, Gate 11 launch
+assets, Gate 12 SUMMARY.md.

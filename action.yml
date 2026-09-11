@@ -1,0 +1,73 @@
+name: "ciburn — GitHub Actions cost audit"
+description: "Audit this repository's workflows and run history for wasted CI minutes and money; post the report on pull requests."
+author: "Aditya Sumanth"
+branding:
+  icon: "dollar-sign"
+  color: "orange"
+inputs:
+  token:
+    description: "Token used to read run history and post the comment (needs actions:read, pull-requests:write)."
+    default: ${{ github.token }}
+  repo:
+    description: "owner/name to audit."
+    default: ${{ github.repository }}
+  days:
+    description: "History window in days."
+    default: "30"
+  fail-on:
+    description: "Fail the job when any finding has at least this severity: none, low, medium, high."
+    default: "none"
+  model:
+    description: "Pricing model id (see `ciburn models`)."
+    default: "2026"
+  comment:
+    description: "Post/update a PR comment with the report (pull_request events only)."
+    default: "true"
+  extra-args:
+    description: "Additional arguments passed to `ciburn audit`."
+    default: ""
+outputs:
+  exit-code:
+    description: "ciburn's exit code (0 clean, 1 findings at/above fail-on, 2 error)."
+    value: ${{ steps.audit.outputs.code }}
+  report:
+    description: "Path to the markdown report."
+    value: ${{ steps.audit.outputs.report }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install ciburn from the action checkout
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+    - name: Run ciburn audit
+      id: audit
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: |
+        set +e
+        ciburn audit --repo "${{ inputs.repo }}" --path "$GITHUB_WORKSPACE" --days "${{ inputs.days }}" \
+          --model "${{ inputs.model }}" --format md --output ciburn-report.md --quiet \
+          --fail-on "${{ inputs.fail-on }}" ${{ inputs.extra-args }}
+        code=$?
+        set -e
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        echo "report=ciburn-report.md" >> "$GITHUB_OUTPUT"
+        cat ciburn-report.md >> "$GITHUB_STEP_SUMMARY"
+    - name: Comment on the pull request
+      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        { echo "<!-- ciburn-report -->"; cat ciburn-report.md; } > ciburn-comment.md
+        gh pr comment "${{ github.event.pull_request.number }}" --edit-last --body-file ciburn-comment.md \
+          || gh pr comment "${{ github.event.pull_request.number }}" --body-file ciburn-comment.md
+    - name: Propagate exit code
+      shell: bash
+      run: |
+        code="${{ steps.audit.outputs.code }}"
+        if [ "$code" != "0" ]; then echo "ciburn exited with $code"; exit "$code"; fi

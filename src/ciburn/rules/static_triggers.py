@@ -338,6 +338,7 @@ class W010:
                                 "job": job.key,
                                 "key": "if",
                                 "value": "github.event.pull_request.draft == false",
+                                "safe": False,  # behaviour change: only applied with --rules W010
                             },
                             docs_url=DOCS_URL_DRAFT,
                         ),

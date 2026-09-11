@@ -359,6 +359,7 @@ class W007:
                                 "job": job.key,
                                 "key": "runs-on",
                                 "value": "ubuntu-slim",
+                                "safe": False,  # 15-minute job limit: only applied with --rules W007
                             },
                             docs_url=DOCS_URL_SLIM,
                         ),

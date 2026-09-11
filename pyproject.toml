@@ -76,6 +76,7 @@ ignore = ["PLR0913", "PLR0912", "PLR0915", "PLR2004", "PLR0911", "PLR0917", "T20
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ARG", "PLR", "S101"]
+"src/ciburn/join.py" = ["ARG001"]
 "scripts/**" = ["T201"]
 
 [tool.mypy]
