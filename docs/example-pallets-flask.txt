@@ -1,0 +1,220 @@
+ciburn — pallets/flask · last 30 days · 2026-08-12 → 2026-09-11 · pricing model 2026
+Observed: 61 runs · 217 jobs · 217 billed minutes · $2.08 list price (≈$2.08/month)
+By runner: actions_linux 191 min $1.15 · actions_macos 13 min $0.81 · actions_windows 13 min $0.13
+Rounding: per-job round-up to whole minutes added 149 min (69% of billed minutes)
+Recoverable (sum of estimates, may overlap): 141 min · $1.34 (≈$1.34/month)
+
+Where the minutes go (top job groups)                                                
+                                                                                     
+  workflow          job                    jobs   billed min   list price   p50 min  
+ ─────────────────────────────────────────────────────────────────────────────────── 
+  lock.yaml         lock                     30           30        $0.18       0.1  
+  pre-commit.yaml   main                     18           18        $0.11       0.3  
+  tests.yaml        typing                   13           13        $0.08       0.3  
+  tests.yaml        Development Versions     13           13        $0.08       0.3  
+  tests.yaml        PyPy                     13           13        $0.08       0.5  
+  tests.yaml        3.15                     13           13        $0.08       0.4  
+  tests.yaml        3.10                     13           13        $0.08       0.2  
+  tests.yaml        3.12                     13           13        $0.08       0.2  
+                                                                                     
+MEASURED — from this repository's own run history (8)                                                                               
+                                                                                                                                    
+  rule   sev      where                  observed                  recoverable (estimate)      conf     finding                     
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  W005   low      tests.yaml#tests       169 min · $1.79 · n=13    103 min · $1.09             medium   Job `tests` in              
+                                                                   (≈$1.09/mo)                          .github/workflows/tests.ya  
+                                                                                                        ml expands to 12 matrix     
+                                                                                                        legs. GitHub bills each     
+                                                                                                        leg rounded up to a whole   
+                                                                                                        minute, so short legs pay   
+                                                                                                        up to 59 s of rounding      
+                                                                                                        each: 12 legs can bill up   
+                                                                                                        to 12 extra minutes per     
+                                                                                                        run. Average leg 0.3 min;   
+                                                                                                        per-job rounding added 110  
+                                                                                                        min (65% of billed) across  
+                                                                                                        169 legs in 13 runs.        
+                                                                                                        method: billed minutes      
+                                                                                                        minus the minutes the same  
+                                                                                                        work would bill if every    
+                                                                                                        leg of a run shared one     
+                                                                                                        job (per-job round-up       
+                                                                                                        removed; assumes legs run   
+                                                                                                        sequentially on one         
+                                                                                                        runner)                     
+                                                                                                        fix: Merge short legs       
+                                                                                                        (e.g. run several versions  
+                                                                                                        in one job) or prune the    
+                                                                                                        matrix.                     
+  H002   medium   lock.yaml              30 min · $0.18 · n=30     27 min · $0.16              high     .github/workflows/lock.yam  
+                                                                   (≈$0.16/mo)                          l: 27 of 30 scheduled runs  
+                                                                                                        (90%) ran on exactly the    
+                                                                                                        commit the previous         
+                                                                                                        scheduled run had already   
+                                                                                                        tested.                     
+                                                                                                        method: billed minutes of   
+                                                                                                        scheduled runs whose        
+                                                                                                        head_sha equals the         
+                                                                                                        previous scheduled run's    
+                                                                                                        fix: Skip the run when the  
+                                                                                                        head commit has not         
+                                                                                                        changed since the last      
+                                                                                                        scheduled run (compare      
+                                                                                                        `git rev-parse HEAD` to a   
+                                                                                                        cached value), or lower     
+                                                                                                        the frequency.              
+  W012   low      tests.yaml#tests       169 min · $1.79 · n=13    6 min · $0.06 (≈$0.06/mo)   low      Job `tests` in              
+                                                                                                        .github/workflows/tests.ya  
+                                                                                                        ml sets `fail-fast: false`  
+                                                                                                        on a 12-leg matrix; when    
+                                                                                                        one leg fails on a PR, the  
+                                                                                                        other legs run to           
+                                                                                                        completion and are billed   
+                                                                                                        even though the run is      
+                                                                                                        already red.                
+                                                                                                        method: minutes sibling     
+                                                                                                        legs kept running after     
+                                                                                                        the first leg failed, in 4  
+                                                                                                        of 13 runs                  
+                                                                                                        fix: Use `fail-fast: ${{    
+                                                                                                        github.event_name ==        
+                                                                                                        'pull_request' }}` to keep  
+                                                                                                        full results on main only.  
+  W004   low      pre-commit.yaml        18 min · $0.11 · n=18     5 min · $0.03 (≈$0.03/mo)   medium   .github/workflows/pre-comm  
+                                                                                                        it.yaml runs on push,       
+                                                                                                        pull_request for every      
+                                                                                                        change, but this            
+                                                                                                        repository has separable    
+                                                                                                        trees (docs/**, **.md);     
+                                                                                                        changes that only touch     
+                                                                                                        them still pay for a full   
+                                                                                                        run.                        
+                                                                                                        method: billed minutes of   
+                                                                                                        5 runs whose head commit    
+                                                                                                        touched only docs/**,       
+                                                                                                        **.md (18 of 18 runs have   
+                                                                                                        commit file lists)          
+                                                                                                        fix: Add `paths-ignore`     
+                                                                                                        for documentation-only      
+                                                                                                        trees (or `paths` for the   
+                                                                                                        code).                      
+  W003   medium   tests.yaml#tests       169 min · $1.79 · n=169   0 min · $0 (≈$0/mo)         high     Job `tests` in              
+                                                                                                        .github/workflows/tests.ya  
+                                                                                                        ml has no                   
+                                                                                                        `timeout-minutes`; a hung   
+                                                                                                        step bills up to 360        
+                                                                                                        minutes per leg before      
+                                                                                                        GitHub cancels it.          
+                                                                                                        Observed p50 0.3 min, p95   
+                                                                                                        0.6 min, max 0.9 min.       
+                                                                                                        method: minutes billed      
+                                                                                                        beyond a 5-minute timeout   
+                                                                                                        (1.5x observed p95); 0 of   
+                                                                                                        169 jobs exceeded it        
+                                                                                                        fix: Set `timeout-minutes:  
+                                                                                                        5` (1.5x the observed p95   
+                                                                                                        of 0.6 min).                
+  W003   medium   lock.yaml#lock         30 min · $0.18 · n=30     0 min · $0 (≈$0/mo)         high     Job `lock` in               
+                                                                                                        .github/workflows/lock.yam  
+                                                                                                        l has no                    
+                                                                                                        `timeout-minutes`; a hung   
+                                                                                                        step bills up to 360        
+                                                                                                        minutes per leg before      
+                                                                                                        GitHub cancels it.          
+                                                                                                        Observed p50 0.1 min, p95   
+                                                                                                        0.2 min, max 0.2 min.       
+                                                                                                        method: minutes billed      
+                                                                                                        beyond a 5-minute timeout   
+                                                                                                        (1.5x observed p95); 0 of   
+                                                                                                        30 jobs exceeded it         
+                                                                                                        fix: Set `timeout-minutes:  
+                                                                                                        5` (1.5x the observed p95   
+                                                                                                        of 0.2 min).                
+  W003   medium   pre-commit.yaml#main   18 min · $0.11 · n=18     0 min · $0 (≈$0/mo)         medium   Job `main` in               
+                                                                                                        .github/workflows/pre-comm  
+                                                                                                        it.yaml has no              
+                                                                                                        `timeout-minutes`; a hung   
+                                                                                                        step bills up to 360        
+                                                                                                        minutes per leg before      
+                                                                                                        GitHub cancels it.          
+                                                                                                        Observed p50 0.3 min, p95   
+                                                                                                        0.5 min, max 0.5 min.       
+                                                                                                        method: minutes billed      
+                                                                                                        beyond a 5-minute timeout   
+                                                                                                        (1.5x observed p95); 0 of   
+                                                                                                        18 jobs exceeded it         
+                                                                                                        fix: Set `timeout-minutes:  
+                                                                                                        5` (1.5x the observed p95   
+                                                                                                        of 0.5 min).                
+  W003   medium   tests.yaml#typing      13 min · $0.08 · n=13     0 min · $0 (≈$0/mo)         medium   Job `typing` in             
+                                                                                                        .github/workflows/tests.ya  
+                                                                                                        ml has no                   
+                                                                                                        `timeout-minutes`; a hung   
+                                                                                                        step bills up to 360        
+                                                                                                        minutes per leg before      
+                                                                                                        GitHub cancels it.          
+                                                                                                        Observed p50 0.3 min, p95   
+                                                                                                        0.5 min, max 0.5 min.       
+                                                                                                        method: minutes billed      
+                                                                                                        beyond a 5-minute timeout   
+                                                                                                        (1.5x observed p95); 0 of   
+                                                                                                        13 jobs exceeded it         
+                                                                                                        fix: Set `timeout-minutes:  
+                                                                                                        5` (1.5x the observed p95   
+                                                                                                        of 0.5 min).                
+                                                                                                                                    
+ADVISORY — configuration only, no history evidence (8)                                                                              
+                                                                                                                                    
+  rule   sev      where                         finding                                   fix                                       
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  W002   medium   publish.yaml#build            Job `build` in                            Set `cache: pip` on                       
+                                                .github/workflows/publish.yaml installs   `actions/setup-python`, or cache          
+                                                dependencies (`Run                        `~/.cache/pip` with `actions/cache`.      
+                                                actions/setup-python@5fda3b95a4ea91299a                                             
+                                                34e894583c3862153e4b97`) on every run                                               
+                                                and never restores a cache.                                                         
+  W003   medium   publish.yaml#build            Job `build` in                            Set `timeout-minutes` to roughly 1.5x     
+                                                .github/workflows/publish.yaml has no     the job's p95 runtime.                    
+                                                `timeout-minutes`; a hung step bills up                                             
+                                                to 360 minutes per leg before GitHub                                                
+                                                cancels it.                                                                         
+  W003   medium   publish.yaml#create-release   Job `create-release` in                   Set `timeout-minutes` to roughly 1.5x     
+                                                .github/workflows/publish.yaml has no     the job's p95 runtime.                    
+                                                `timeout-minutes`; a hung step bills up                                             
+                                                to 360 minutes per leg before GitHub                                                
+                                                cancels it.                                                                         
+  W003   medium   publish.yaml#publish-pypi     Job `publish-pypi` in                     Set `timeout-minutes` to roughly 1.5x     
+                                                .github/workflows/publish.yaml has no     the job's p95 runtime.                    
+                                                `timeout-minutes`; a hung step bills up                                             
+                                                to 360 minutes per leg before GitHub                                                
+                                                cancels it.                                                                         
+  W003   medium   zizmor.yaml#zizmor            Job `zizmor` in                           Set `timeout-minutes` to roughly 1.5x     
+                                                .github/workflows/zizmor.yaml has no      the job's p95 runtime.                    
+                                                `timeout-minutes`; a hung step bills up                                             
+                                                to 360 minutes per leg before GitHub                                                
+                                                cancels it.                                                                         
+  W004   low      publish.yaml                  .github/workflows/publish.yaml runs on    Add `paths-ignore` for                    
+                                                push for every change, but this           documentation-only trees (or `paths` for  
+                                                repository has separable trees            the code).                                
+                                                (docs/**, **.md); changes that only                                                 
+                                                touch them still pay for a full run.                                                
+  W007   low      zizmor.yaml#zizmor            Job `zizmor` in                           Switch `runs-on` to `ubuntu-slim` if the  
+                                                .github/workflows/zizmor.yaml runs on     job stays well under 15 minutes.          
+                                                `ubuntu-latest` (2-core, list price                                                 
+                                                $0.006/min) but every step is                                                       
+                                                lightweight (linting, labelling,                                                    
+                                                scripting). `ubuntu-slim` (1 vCPU,                                                  
+                                                $0.002/min, 15-minute job limit) is                                                 
+                                                built for this.                                                                     
+  W011   low      publish.yaml#build            Job `build` in                            Narrow `path` to what is needed and set   
+                                                .github/workflows/publish.yaml uploads    `retention-days` (e.g. 7).                
+                                                `dist/` as an artifact with the default                                             
+                                                retention (up to 90 days); broad paths                                              
+                                                accrue storage charges long after the                                               
+                                                run is forgotten.                                                                   
+                                                                                                                                    
+
+note: Public repository: standard-runner minutes are free on GitHub. Costs are the private-repository list-price equivalent.
+
+Estimates are labelled as such; each carries its method (see --format json or md). Rates: 
+https://docs.github.com/en/billing/reference/actions-runner-pricing (fetched 2026-09-11).

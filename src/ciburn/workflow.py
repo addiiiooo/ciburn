@@ -62,7 +62,7 @@ class Step:
         if self.run:
             return "Run " + self.run.strip().splitlines()[0][:80]
         if self.uses:
-            return "Run " + self.uses
+            return "Run " + (self.action_repo or self.uses)
         return f"step {self.index}"
 
 

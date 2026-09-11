@@ -149,7 +149,7 @@ class W004:
             unfiltered = [
                 ev
                 for ev in ("push", "pull_request")
-                if ev in wf.on and not _has_path_filter(wf.on[ev])
+                if ev in wf.on and not _has_path_filter(wf.on[ev]) and not _tags_only(wf.on[ev])
             ]
             if not unfiltered:
                 continue
@@ -182,6 +182,13 @@ class W004:
 
 def _has_path_filter(cfg: dict[str, Any]) -> bool:
     return any(k in cfg for k in ("paths", "paths-ignore"))
+
+
+def _tags_only(cfg: dict[str, Any]) -> bool:
+    """A push trigger restricted to tags: path filters do not apply to tag pushes."""
+    return ("tags" in cfg or "tags-ignore" in cfg) and not any(
+        k in cfg for k in ("branches", "branches-ignore")
+    )
 
 
 def _looks_like_docs_workflow(wf: Workflow) -> bool:

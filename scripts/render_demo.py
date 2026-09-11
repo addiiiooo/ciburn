@@ -27,7 +27,9 @@ def main() -> None:
     ap.add_argument("--offline", action="store_true")
     ap.add_argument("--cache", type=Path, default=None)
     args = ap.parse_args()
-    result = run_audit(AuditOptions(repo=args.repo, days=args.days, offline=args.offline, cache=args.cache))
+    result = run_audit(
+        AuditOptions(repo=args.repo, days=args.days, offline=args.offline, cache=args.cache)
+    )
     console = Console(record=True, width=args.width, force_terminal=True, color_system="truecolor")
     render_terminal(result, console, max_rows=args.max_rows)
     args.out.parent.mkdir(parents=True, exist_ok=True)

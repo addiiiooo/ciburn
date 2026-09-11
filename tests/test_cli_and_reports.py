@@ -139,7 +139,7 @@ def test_reporters(repo_dir: Path, cache_with_history: Path) -> None:
     j = json.loads(render_json(res))
     assert j["schema_version"] == 1
     assert j["findings"]
-    with (Path(cache_with_history).parent / "t.txt").open("w") as fh:
+    with (Path(cache_with_history).parent / "t.txt").open("w", encoding="utf-8") as fh:
         console = Console(record=True, width=120, file=fh)
         render_terminal(res, console)
         text = console.export_text()
@@ -158,7 +158,7 @@ def test_reporters(repo_dir: Path, cache_with_history: Path) -> None:
     )
     assert "boom" in render_markdown(empty)
     assert "boom" in render_html(empty)
-    with (Path(cache_with_history).parent / "t2.txt").open("w") as fh2:
+    with (Path(cache_with_history).parent / "t2.txt").open("w", encoding="utf-8") as fh2:
         c2 = Console(record=True, width=100, file=fh2)
         render_terminal(empty, c2)
         assert "no findings" in c2.export_text()

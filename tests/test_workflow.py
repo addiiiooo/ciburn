@@ -152,7 +152,7 @@ def test_step_display_and_reusable() -> None:
     s = Step(index=0, name=None, uses="org/act/sub@v1", run=None, with_={}, if_=None)
     assert s.action == "org/act/sub"
     assert s.action_repo == "org/act"
-    assert s.display_name == "Run org/act/sub@v1"
+    assert s.display_name == "Run org/act"
     s2 = Step(index=3, name=None, uses=None, run=None, with_={}, if_=None)
     assert s2.display_name == "step 3"
     assert s2.action is None
