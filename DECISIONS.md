@@ -110,3 +110,18 @@ maintenance jobs (issue locking, stale bots) are not called "gates".
 per-job rounding is ≥25 % of a matrix job's billed minutes, the join emits a
 measured W005 regardless of leg count. Rounding is the load-bearing 2026
 insight; a 4-leg matrix of 70-second jobs deserves the finding.
+
+## D013 — Summed recoverable estimates are capped at the observed total
+
+**Decision:** per-finding recoverable estimates overlap (the same minutes can
+be superseded, re-run and rounded). The headline "recoverable" line shows the
+sum capped at the observed billed minutes/cost and says "not additive"; the
+JSON carries both the raw sum and the capped value. Seen on
+`BurntSushi/ripgrep`, where the raw sum exceeded the observed total.
+
+## D014 — Launch posts are generated, not written
+
+**Decision:** `scripts/build_launch.py` renders `launch/*.md` from
+`dataset/summary.json` so every number in a post is traceable to the dataset
+and the posts regenerate when the corpus scan completes. While the scan is
+partial the Show HN draft carries a visible sample note.

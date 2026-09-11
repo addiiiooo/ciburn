@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from ciburn.findings import Confidence, Evidence, Finding, Kind, Remediation, Severity
@@ -24,6 +24,7 @@ class Context:
     history: HistoryView | None = None
     window_days: int = 90
     public_repo: bool | None = None
+    ignore: set[str] = field(default_factory=set)
 
     @property
     def parsed_workflows(self) -> list[Workflow]:
@@ -41,11 +42,19 @@ class Rule(Protocol):
 
 
 def run_rules(ctx: Context, rules: Iterable[Rule]) -> list[Finding]:
+    """Run rules, dropping findings suppressed by ``# ciburn-ignore:`` comments in the
+    workflow file or by ``ctx.ignore`` (the ``--ignore`` flag)."""
+    ignored_by_wf = {w.path: w.ignored_rules for w in ctx.workflows}
     out: list[Finding] = []
     for rule in rules:
         if rule.needs_history and ctx.history is None:
             continue
-        out.extend(rule.run(ctx))
+        if rule.id in ctx.ignore:
+            continue
+        for f in rule.run(ctx):
+            if f.workflow and f.rule_id in ignored_by_wf.get(f.workflow, set()):
+                continue
+            out.append(f)
     return out
 
 

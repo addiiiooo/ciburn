@@ -1,0 +1,343 @@
+{
+  "generated_at": "2026-09-11T20:00:05Z",
+  "ciburn_version": "0.1.0",
+  "sample": {
+    "selected": 1993,
+    "selected_at": "2026-09-11T18:40:44Z",
+    "scanned": 362,
+    "with_workflows": 270,
+    "without_workflows": 92,
+    "not_scanned_or_failed": 1631,
+    "per_cell": 50,
+    "languages": [
+      "Python",
+      "JavaScript",
+      "TypeScript",
+      "Go",
+      "Rust",
+      "Java",
+      "C++",
+      "C#",
+      "Ruby",
+      "PHP"
+    ],
+    "star_buckets": [
+      [
+        100,
+        499
+      ],
+      [
+        500,
+        1999
+      ],
+      [
+        2000,
+        9999
+      ],
+      [
+        10000,
+        1000000
+      ]
+    ],
+    "pushed_since": "2026-06-01",
+    "window_days": 90,
+    "by_language": {
+      "JavaScript": 162,
+      "Python": 200
+    },
+    "by_star_bucket": {
+      "100-499": 100,
+      "10000-inf": 62,
+      "2000-9999": 100,
+      "500-1999": 100
+    }
+  },
+  "prevalence": {
+    "repos_with_workflows": 270,
+    "cache_any_job_pct": 59.6,
+    "repos_with_install_steps": 242,
+    "install_repos_with_cache_pct": 59.5,
+    "timeout_any_job_pct": 24.4,
+    "timeout_all_jobs_pct": 4.1,
+    "pr_workflow_repos": 232,
+    "concurrency_cancel_pct_of_pr_repos": 34.5,
+    "scheduled_workflow_repos_pct": 45.2,
+    "workflow_files": 1983,
+    "workflow_parse_errors": 1,
+    "workflows_with_path_filter_pct": 18.0,
+    "icse2024_baseline": {
+      "caching_paid_tier_pct": 32.9,
+      "custom_timeout_paid_tier_pct": 14.0,
+      "failed_runs_pct": 17.4,
+      "failed_vm_time_pct": 30.9,
+      "scheduled_runs_pct": 29.8,
+      "scheduled_vm_time_pct": 15.4,
+      "scheduled_failure_pct": 13.0,
+      "source": "https://software-lab.org/publications/icse2024_workflows.pdf"
+    }
+  },
+  "runs": {
+    "listed": 36023,
+    "completed": 35790,
+    "failed_pct_of_completed": 14.8,
+    "scheduled_pct_of_completed": 12.8,
+    "scheduled_failed_pct": 15.0,
+    "reruns_pct_of_completed": 2.7,
+    "by_event_pct": {
+      "pull_request": 38.1,
+      "push": 19.0,
+      "schedule": 12.8,
+      "dynamic": 12.5,
+      "pull_request_target": 5.4,
+      "workflow_run": 3.3,
+      "issue_comment": 2.9,
+      "issues": 2.3
+    },
+    "total_in_window_90d_sum": 4110361,
+    "repos_truncated_at_200_runs": 140
+  },
+  "minutes": {
+    "jobs_sampled": 7460,
+    "runs_with_job_data": 1779,
+    "billed_minutes": 33969,
+    "raw_minutes": 30282,
+    "rounding_waste_minutes": 3687,
+    "rounding_waste_pct_of_billed": 10.9,
+    "rounding_waste_pct_per_repo_median": 28.0,
+    "rounding_waste_pct_per_repo_p90": 71.2,
+    "jobs_under_1_minute_pct": 52.7,
+    "jobs_under_2_minutes_pct": 76.0,
+    "failed_jobs_pct": 9.1,
+    "failed_jobs_minutes_pct": 8.0,
+    "scheduled_jobs_minutes_pct": 9.0,
+    "rerun_attempt_minutes_pct": 5.0,
+    "hosted_priced_minutes_pct": 96.2,
+    "hosted_unpriced_minutes_pct": 0.8,
+    "self_hosted_or_custom_minutes_pct": 3.0,
+    "by_sku_minutes": {
+      "actions_linux": 21593,
+      "actions_macos": 7050,
+      "actions_windows": 3535,
+      "unpriced": 1306,
+      "actions_linux_arm": 346,
+      "actions_windows_arm": 79,
+      "actions_linux_slim": 60
+    },
+    "queue_minutes_pct_of_exec": 53.4
+  },
+  "cost": {
+    "sampled_jobs_list_price_2026": 604.65,
+    "sampled_jobs_list_price_2025": 795.94,
+    "list_price_change_pct_2026_vs_2025": -24.0,
+    "repos_with_lower_2026_list_price_pct": 100.0,
+    "repos_with_equal_2026_list_price_pct": 0.0,
+    "est_90d_list_price_2026_per_repo_median": 5.73,
+    "est_90d_list_price_2026_per_repo_p90": 1204.14,
+    "est_90d_list_price_2026_per_repo_max": 131518.37,
+    "est_90d_list_price_2026_sum": 253514.48,
+    "announced_self_hosted_charge_on_sampled_minutes": 2.05,
+    "announced_self_hosted_charge_pct_of_2026_list_price": 0.3
+  },
+  "rules": {
+    "H001": {
+      "repos_flagged": 22,
+      "repos_flagged_pct": 8.1,
+      "findings": 29,
+      "measured_findings": 29,
+      "recoverable_minutes_est_sum": 557,
+      "recoverable_minutes_est_pct_of_sampled_billed": 1.6,
+      "recoverable_cost_2026_est_sum": 3.88
+    },
+    "H002": {
+      "repos_flagged": 80,
+      "repos_flagged_pct": 29.6,
+      "findings": 112,
+      "measured_findings": 112,
+      "recoverable_minutes_est_sum": 1710,
+      "recoverable_minutes_est_pct_of_sampled_billed": 5.0,
+      "recoverable_cost_2026_est_sum": 23.27
+    },
+    "H003": {
+      "repos_flagged": 6,
+      "repos_flagged_pct": 2.2,
+      "findings": 7,
+      "measured_findings": 7,
+      "recoverable_minutes_est_sum": 340,
+      "recoverable_minutes_est_pct_of_sampled_billed": 1.0,
+      "recoverable_cost_2026_est_sum": 7.95
+    },
+    "H004": {
+      "repos_flagged": 0,
+      "repos_flagged_pct": 0.0,
+      "findings": 0,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "H005": {
+      "repos_flagged": 1,
+      "repos_flagged_pct": 0.4,
+      "findings": 1,
+      "measured_findings": 1,
+      "recoverable_minutes_est_sum": 12,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.07
+    },
+    "H006": {
+      "repos_flagged": 15,
+      "repos_flagged_pct": 5.6,
+      "findings": 20,
+      "measured_findings": 20,
+      "recoverable_minutes_est_sum": 1684,
+      "recoverable_minutes_est_pct_of_sampled_billed": 5.0,
+      "recoverable_cost_2026_est_sum": 40.22
+    },
+    "H007": {
+      "repos_flagged": 0,
+      "repos_flagged_pct": 0.0,
+      "findings": 0,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "H008": {
+      "repos_flagged": 5,
+      "repos_flagged_pct": 1.9,
+      "findings": 8,
+      "measured_findings": 8,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "H009": {
+      "repos_flagged": 0,
+      "repos_flagged_pct": 0.0,
+      "findings": 0,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "W000": {
+      "repos_flagged": 1,
+      "repos_flagged_pct": 0.4,
+      "findings": 1,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "W001": {
+      "repos_flagged": 201,
+      "repos_flagged_pct": 74.4,
+      "findings": 501,
+      "measured_findings": 223,
+      "recoverable_minutes_est_sum": 113,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.3,
+      "recoverable_cost_2026_est_sum": 0.69
+    },
+    "W002": {
+      "repos_flagged": 193,
+      "repos_flagged_pct": 71.5,
+      "findings": 809,
+      "measured_findings": 338,
+      "recoverable_minutes_est_sum": 360,
+      "recoverable_minutes_est_pct_of_sampled_billed": 1.1,
+      "recoverable_cost_2026_est_sum": 5.48
+    },
+    "W003": {
+      "repos_flagged": 258,
+      "repos_flagged_pct": 95.6,
+      "findings": 2462,
+      "measured_findings": 1089,
+      "recoverable_minutes_est_sum": 46,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.1,
+      "recoverable_cost_2026_est_sum": 1.43
+    },
+    "W004": {
+      "repos_flagged": 206,
+      "repos_flagged_pct": 76.3,
+      "findings": 540,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "W005": {
+      "repos_flagged": 105,
+      "repos_flagged_pct": 38.9,
+      "findings": 223,
+      "measured_findings": 123,
+      "recoverable_minutes_est_sum": 1436,
+      "recoverable_minutes_est_pct_of_sampled_billed": 4.2,
+      "recoverable_cost_2026_est_sum": 19.68
+    },
+    "W006": {
+      "repos_flagged": 68,
+      "repos_flagged_pct": 25.2,
+      "findings": 179,
+      "measured_findings": 54,
+      "recoverable_minutes_est_sum": 11,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.13
+    },
+    "W007": {
+      "repos_flagged": 104,
+      "repos_flagged_pct": 38.5,
+      "findings": 278,
+      "measured_findings": 116,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.91
+    },
+    "W008": {
+      "repos_flagged": 22,
+      "repos_flagged_pct": 8.1,
+      "findings": 58,
+      "measured_findings": 3,
+      "recoverable_minutes_est_sum": 14,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.08
+    },
+    "W009": {
+      "repos_flagged": 81,
+      "repos_flagged_pct": 30.0,
+      "findings": 171,
+      "measured_findings": 96,
+      "recoverable_minutes_est_sum": 202,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.6,
+      "recoverable_cost_2026_est_sum": 3.41
+    },
+    "W010": {
+      "repos_flagged": 104,
+      "repos_flagged_pct": 38.5,
+      "findings": 218,
+      "measured_findings": 99,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "W011": {
+      "repos_flagged": 21,
+      "repos_flagged_pct": 7.8,
+      "findings": 31,
+      "measured_findings": 0,
+      "recoverable_minutes_est_sum": 0,
+      "recoverable_minutes_est_pct_of_sampled_billed": 0.0,
+      "recoverable_cost_2026_est_sum": 0.0
+    },
+    "W012": {
+      "repos_flagged": 88,
+      "repos_flagged_pct": 32.6,
+      "findings": 219,
+      "measured_findings": 97,
+      "recoverable_minutes_est_sum": 709,
+      "recoverable_minutes_est_pct_of_sampled_billed": 2.1,
+      "recoverable_cost_2026_est_sum": 8.07
+    }
+  },
+  "h001_dead_cron_repos": 22,
+  "scheduled_repos": 122
+}

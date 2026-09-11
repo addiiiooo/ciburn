@@ -1,0 +1,308 @@
+ciburn — BurntSushi/ripgrep · last 30 days · 2026-08-12 → 2026-09-11 · pricing model 2026
+Observed: 48 runs · 1,056 jobs · 5,043 billed minutes · $36.10 list price (≈$36.10/month)
+By runner: actions_linux 4,545 min $27.27 · actions_windows 281 min $2.81 · actions_windows_arm 143 min $1.43 · actions_macos 74 min
+$4.59
+Rounding: per-job round-up to whole minutes added 606 min (12% of billed minutes)
+Recoverable: per-finding estimates overlap and are not additive; the largest single one is H002 at 3,505 min · $24.57 
+(≈$24.57/month)
+
+Where the minutes go (top job groups)                                              
+                                                                                   
+  workflow   job                         jobs   billed min   list price   p50 min  
+ ───────────────────────────────────────────────────────────────────────────────── 
+  ci.yml     test                         864        4,841       $34.89       3.0  
+  ci.yml     Compile Fuzz Test Targets     48           56        $0.34       0.8  
+  ci.yml     rustfmt                       48           49        $0.29       0.2  
+  ci.yml     docs                          48           49        $0.29       0.3  
+  ci.yml     wasm                          48           48        $0.29       0.4  
+                                                                                   
+MEASURED — from this repository's own run history (13)                                                                              
+                                                                                                                                    
+  rule   sev      where                 observed                    recoverable (estimate)      conf     finding                    
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  H002   medium   ci.yml                3,587 min · $25.15 · n=30   3,505 min · $24.57          high     .github/workflows/ci.yml:  
+                                                                    (≈$24.57/mo)                         29 of 30 scheduled runs    
+                                                                                                         (97%) ran on exactly the   
+                                                                                                         commit the previous        
+                                                                                                         scheduled run had already  
+                                                                                                         tested.                    
+                                                                                                         method: billed minutes of  
+                                                                                                         scheduled runs whose       
+                                                                                                         head_sha equals the        
+                                                                                                         previous scheduled run's   
+                                                                                                         fix: Skip the run when     
+                                                                                                         the head commit has not    
+                                                                                                         changed since the last     
+                                                                                                         scheduled run (compare     
+                                                                                                         `git rev-parse HEAD` to a  
+                                                                                                         cached value), or lower    
+                                                                                                         the frequency.             
+  W003   medium   ci.yml#test           4,841 min · $34.89 ·        1,075 min · $7.75           high     Job `test` in              
+                                        n=864                       (≈$7.75/mo)                          .github/workflows/ci.yml   
+                                                                                                         has no `timeout-minutes`;  
+                                                                                                         a hung step bills up to    
+                                                                                                         360 minutes per leg        
+                                                                                                         before GitHub cancels it.  
+                                                                                                         Observed p50 3.0 min, p95  
+                                                                                                         8.7 min, max 360.3 min.    
+                                                                                                         method: minutes billed     
+                                                                                                         beyond a 14-minute         
+                                                                                                         timeout (1.5x observed     
+                                                                                                         p95); 4 of 864 jobs        
+                                                                                                         exceeded it                
+                                                                                                         fix: Set                   
+                                                                                                         `timeout-minutes: 14`      
+                                                                                                         (1.5x the observed p95 of  
+                                                                                                         8.7 min).                  
+  W012   low      ci.yml#test           4,841 min · $34.89 · n=48   940 min · $6.77             low      Job `test` in              
+                                                                    (≈$6.77/mo)                          .github/workflows/ci.yml   
+                                                                                                         sets `fail-fast: false`    
+                                                                                                         on a 18-leg matrix; when   
+                                                                                                         one leg fails on a PR,     
+                                                                                                         the other legs run to      
+                                                                                                         completion and are billed  
+                                                                                                         even though the run is     
+                                                                                                         already red.               
+                                                                                                         method: minutes sibling    
+                                                                                                         legs kept running after    
+                                                                                                         the first leg failed, in   
+                                                                                                         2 of 48 runs               
+                                                                                                         fix: Use `fail-fast: ${{   
+                                                                                                         github.event_name ==       
+                                                                                                         'pull_request' }}` to      
+                                                                                                         keep full results on main  
+                                                                                                         only.                      
+  W005   low      ci.yml#test           4,841 min · $34.89 · n=48   472 min · $3.40             high     Job `test` in              
+                                                                    (≈$3.40/mo)                          .github/workflows/ci.yml   
+                                                                                                         expands to 18 matrix       
+                                                                                                         legs. GitHub bills each    
+                                                                                                         leg rounded up to a whole  
+                                                                                                         minute, so short legs pay  
+                                                                                                         up to 59 s of rounding     
+                                                                                                         each: 18 legs can bill up  
+                                                                                                         to 18 extra minutes per    
+                                                                                                         run. Average leg 5.0 min;  
+                                                                                                         per-job rounding added     
+                                                                                                         494 min (10% of billed)    
+                                                                                                         across 864 legs in 48      
+                                                                                                         runs.                      
+                                                                                                         method: billed minutes     
+                                                                                                         minus the minutes the      
+                                                                                                         same work would bill if    
+                                                                                                         every leg of a run shared  
+                                                                                                         one job (per-job round-up  
+                                                                                                         removed; assumes legs run  
+                                                                                                         sequentially on one        
+                                                                                                         runner)                    
+                                                                                                         fix: Merge short legs      
+                                                                                                         (e.g. run several          
+                                                                                                         versions in one job) or    
+                                                                                                         prune the matrix.          
+  W001   medium   ci.yml                1,456 min · $10.94 · n=18   169 min · $1.25             medium   .github/workflows/ci.yml   
+                                                                    (≈$1.25/mo)                          runs on pull_request but   
+                                                                                                         has no `concurrency`       
+                                                                                                         block; every new push to   
+                                                                                                         a pull request starts a    
+                                                                                                         fresh run while the        
+                                                                                                         previous run keeps         
+                                                                                                         burning minutes until it   
+                                                                                                         finishes. In the last 30   
+                                                                                                         days, 2 of 18 PR runs      
+                                                                                                         were superseded while      
+                                                                                                         still running.             
+                                                                                                         method: billed minutes of  
+                                                                                                         2 PR runs that a newer     
+                                                                                                         run on the same branch     
+                                                                                                         superseded before they     
+                                                                                                         finished (upper bound:     
+                                                                                                         cancellation would have    
+                                                                                                         saved the remainder, not   
+                                                                                                         the whole run)             
+                                                                                                         fix: Add a concurrency     
+                                                                                                         group keyed on the PR/ref  
+                                                                                                         with cancel-in-progress.   
+  W004   low      ci.yml                1,456 min · $10.94 · n=18   80 min · $0.62              medium   .github/workflows/ci.yml   
+                                                                    (≈$0.62/mo)                          runs on push,              
+                                                                                                         pull_request for every     
+                                                                                                         change, but this           
+                                                                                                         repository has separable   
+                                                                                                         trees (**.md); changes     
+                                                                                                         that only touch them       
+                                                                                                         still pay for a full run.  
+                                                                                                         method: billed minutes of  
+                                                                                                         1 runs whose head commit   
+                                                                                                         touched only **.md (18 of  
+                                                                                                         18 runs have commit file   
+                                                                                                         lists)                     
+                                                                                                         fix: Add `paths-ignore`    
+                                                                                                         for documentation-only     
+                                                                                                         trees (or `paths` for the  
+                                                                                                         code).                     
+  W002   medium   ci.yml#fuzz_testing   56 min · $0.34 · n=48       14 min · $0.08              high     Job `fuzz_testing` in      
+                                                                    (≈$0.08/mo)                          .github/workflows/ci.yml   
+                                                                                                         installs dependencies      
+                                                                                                         (`Install required         
+                                                                                                         packages (Ubuntu)`) on     
+                                                                                                         every run and never        
+                                                                                                         restores a cache.          
+                                                                                                         Dependency installation    
+                                                                                                         is 67% of this job's       
+                                                                                                         measured time.             
+                                                                                                         method: half of the        
+                                                                                                         measured                   
+                                                                                                         dependency-install step    
+                                                                                                         time (28 min across 48     
+                                                                                                         jobs, steps: Install       
+                                                                                                         Fuzzer, Install Rust,      
+                                                                                                         Install required packages  
+                                                                                                         (Ubuntu)); a warm cache    
+                                                                                                         typically removes most of  
+                                                                                                         it                         
+                                                                                                         fix: Cache apt packages    
+                                                                                                         with                       
+                                                                                                         `awalsh128/cache-apt-pkgs  
+                                                                                                         -action` or prebuild a     
+                                                                                                         container image.           
+  W002   medium   ci.yml#wasm           48 min · $0.29 · n=48       2 min · $0.01 (≈$0.01/mo)   high     Job `wasm` in              
+                                                                                                         .github/workflows/ci.yml   
+                                                                                                         installs dependencies      
+                                                                                                         (`Basic build`) on every   
+                                                                                                         run and never restores a   
+                                                                                                         cache. Dependency          
+                                                                                                         installation is 20% of     
+                                                                                                         this job's measured time.  
+                                                                                                         method: half of the        
+                                                                                                         measured                   
+                                                                                                         dependency-install step    
+                                                                                                         time (4 min across 42      
+                                                                                                         jobs, steps: Install       
+                                                                                                         Rust); a warm cache        
+                                                                                                         typically removes most of  
+                                                                                                         it                         
+                                                                                                         fix: Add                   
+                                                                                                         `Swatinem/rust-cache`      
+                                                                                                         before the build step.     
+  W010   low      ci.yml#test           1,379 min · $10.48 ·        not estimated               high     Job `test` in              
+                                        n=324                                                            .github/workflows/ci.yml   
+                                                                                                         looks expensive (matrix    
+                                                                                                         of 18 legs) and runs on    
+                                                                                                         every push to every pull   
+                                                                                                         request, including drafts  
+                                                                                                         and docs-only changes.     
+                                                                                                         method: no estimate:       
+                                                                                                         draft status of past pull  
+                                                                                                         requests is not in the     
+                                                                                                         run history                
+                                                                                                         fix: Skip drafts with      
+                                                                                                         `if:                       
+                                                                                                         github.event.pull_request  
+                                                                                                         .draft == false` and/or    
+                                                                                                         add `paths-ignore`.        
+  W003   medium   ci.yml#fuzz_testing   56 min · $0.34 · n=48       0 min · $0 (≈$0/mo)         high     Job `fuzz_testing` in      
+                                                                                                         .github/workflows/ci.yml   
+                                                                                                         has no `timeout-minutes`;  
+                                                                                                         a hung step bills up to    
+                                                                                                         360 minutes per leg        
+                                                                                                         before GitHub cancels it.  
+                                                                                                         Observed p50 0.8 min, p95  
+                                                                                                         1.0 min, max 2.0 min.      
+                                                                                                         method: minutes billed     
+                                                                                                         beyond a 5-minute timeout  
+                                                                                                         (1.5x observed p95); 0 of  
+                                                                                                         48 jobs exceeded it        
+                                                                                                         fix: Set                   
+                                                                                                         `timeout-minutes: 5`       
+                                                                                                         (1.5x the observed p95 of  
+                                                                                                         1.0 min).                  
+  W003   medium   ci.yml#docs           49 min · $0.29 · n=48       0 min · $0 (≈$0/mo)         high     Job `docs` in              
+                                                                                                         .github/workflows/ci.yml   
+                                                                                                         has no `timeout-minutes`;  
+                                                                                                         a hung step bills up to    
+                                                                                                         360 minutes per leg        
+                                                                                                         before GitHub cancels it.  
+                                                                                                         Observed p50 0.3 min, p95  
+                                                                                                         0.7 min, max 1.1 min.      
+                                                                                                         method: minutes billed     
+                                                                                                         beyond a 5-minute timeout  
+                                                                                                         (1.5x observed p95); 0 of  
+                                                                                                         48 jobs exceeded it        
+                                                                                                         fix: Set                   
+                                                                                                         `timeout-minutes: 5`       
+                                                                                                         (1.5x the observed p95 of  
+                                                                                                         0.7 min).                  
+  W003   medium   ci.yml#rustfmt        49 min · $0.29 · n=48       0 min · $0 (≈$0/mo)         high     Job `rustfmt` in           
+                                                                                                         .github/workflows/ci.yml   
+                                                                                                         has no `timeout-minutes`;  
+                                                                                                         a hung step bills up to    
+                                                                                                         360 minutes per leg        
+                                                                                                         before GitHub cancels it.  
+                                                                                                         Observed p50 0.2 min, p95  
+                                                                                                         0.3 min, max 1.4 min.      
+                                                                                                         method: minutes billed     
+                                                                                                         beyond a 5-minute timeout  
+                                                                                                         (1.5x observed p95); 0 of  
+                                                                                                         48 jobs exceeded it        
+                                                                                                         fix: Set                   
+                                                                                                         `timeout-minutes: 5`       
+                                                                                                         (1.5x the observed p95 of  
+                                                                                                         0.3 min).                  
+  W003   medium   ci.yml#wasm           48 min · $0.29 · n=48       0 min · $0 (≈$0/mo)         high     Job `wasm` in              
+                                                                                                         .github/workflows/ci.yml   
+                                                                                                         has no `timeout-minutes`;  
+                                                                                                         a hung step bills up to    
+                                                                                                         360 minutes per leg        
+                                                                                                         before GitHub cancels it.  
+                                                                                                         Observed p50 0.4 min, p95  
+                                                                                                         0.5 min, max 0.6 min.      
+                                                                                                         method: minutes billed     
+                                                                                                         beyond a 5-minute timeout  
+                                                                                                         (1.5x observed p95); 0 of  
+                                                                                                         48 jobs exceeded it        
+                                                                                                         fix: Set                   
+                                                                                                         `timeout-minutes: 5`       
+                                                                                                         (1.5x the observed p95 of  
+                                                                                                         0.5 min).                  
+                                                                                                                                    
+ADVISORY — configuration only, no history evidence (6)                                                                              
+                                                                                                                                    
+  rule   sev      where                           finding                                  fix                                      
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  W002   medium   release.yml#build-release-deb   Job `build-release-deb` in               Add `Swatinem/rust-cache` before the     
+                                                  .github/workflows/release.yml installs   build step.                              
+                                                  dependencies (`Build debug binary to                                              
+                                                  create release assets`) on every run                                              
+                                                  and never restores a cache.                                                       
+  W003   medium   release.yml#build-release       Job `build-release` in                   Set `timeout-minutes` to roughly 1.5x    
+                                                  .github/workflows/release.yml has no     the job's p95 runtime.                   
+                                                  `timeout-minutes`; a hung step bills                                              
+                                                  up to 360 minutes per leg before                                                  
+                                                  GitHub cancels it.                                                                
+  W003   medium   release.yml#build-release-deb   Job `build-release-deb` in               Set `timeout-minutes` to roughly 1.5x    
+                                                  .github/workflows/release.yml has no     the job's p95 runtime.                   
+                                                  `timeout-minutes`; a hung step bills                                              
+                                                  up to 360 minutes per leg before                                                  
+                                                  GitHub cancels it.                                                                
+  W003   medium   release.yml#create-release      Job `create-release` in                  Set `timeout-minutes` to roughly 1.5x    
+                                                  .github/workflows/release.yml has no     the job's p95 runtime.                   
+                                                  `timeout-minutes`; a hung step bills                                              
+                                                  up to 360 minutes per leg before                                                  
+                                                  GitHub cancels it.                                                                
+  W005   low      release.yml#build-release       Job `build-release` in                   Merge short legs (e.g. run several       
+                                                  .github/workflows/release.yml expands    versions in one job) or prune the        
+                                                  to 14 matrix legs. GitHub bills each     matrix.                                  
+                                                  leg rounded up to a whole minute, so                                              
+                                                  short legs pay up to 59 s of rounding                                             
+                                                  each: 14 legs can bill up to 14 extra                                             
+                                                  minutes per run.                                                                  
+  W012   low      release.yml#build-release       Job `build-release` in                   Use `fail-fast: ${{ github.event_name    
+                                                  .github/workflows/release.yml sets       == 'pull_request' }}` to keep full       
+                                                  `fail-fast: false` on a 14-leg matrix;   results on main only.                    
+                                                  when one leg fails on a PR, the other                                             
+                                                  legs run to completion and are billed                                             
+                                                  even though the run is already red.                                               
+                                                                                                                                    
+
+note: Public repository: standard-runner minutes are free on GitHub. Costs are the private-repository list-price equivalent.
+
+Estimates are labelled as such; each carries its method (see --format json or md). Rates: 
+https://docs.github.com/en/billing/reference/actions-runner-pricing (fetched 2026-09-11).

@@ -90,6 +90,8 @@ def test_run_audit_offline_with_cached_history(repo_dir: Path, cache_with_histor
     assert res.recoverable_cost_total() > 0
     d = res.as_dict()
     assert d["totals"]["billed_minutes"] == res.totals.billed_minutes
+    assert d["summary"]["recoverable_cost_est_capped"] <= d["totals"]["list_price_cost"]
+    assert res.recoverable_minutes_capped() <= res.totals.billed_minutes
     assert d["included_minutes"]["plan"] == "team"
     assert d["pricing"]["public_repo_list_price_equivalent"] is True
     # workflows can also come from the cache when no path is given
@@ -190,6 +192,11 @@ def test_cli_audit_static_and_formats(repo_dir: Path, tmp_path: Path) -> None:
     assert "no .github/workflows" in r.output
     r = runner.invoke(cli, ["audit", "--path", str(repo_dir), "--no-history", "--label-sku", "bad"])
     assert r.exit_code == 2
+    r = runner.invoke(
+        cli,
+        ["audit", "--path", str(repo_dir), "--no-history", "-f", "json", "--ignore", "W003,W001"],
+    )
+    assert {f["rule_id"] for f in json.loads(r.output)["findings"]}.isdisjoint({"W003", "W001"})
 
 
 def test_cli_audit_offline_history_and_price(repo_dir: Path, cache_with_history: Path) -> None:

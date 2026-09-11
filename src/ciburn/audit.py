@@ -46,6 +46,7 @@ class AuditOptions:
     label_overrides: dict[str, str] = field(default_factory=dict)
     max_job_runs: int | None = None
     fetch_commits: bool = True
+    ignore: set[str] = field(default_factory=set)
     progress: Progress | None = None
     now: datetime | None = None
 
@@ -86,6 +87,17 @@ class AuditResult:
 
     def recoverable_minutes_total(self) -> float:
         return sum(f.recoverable_minutes_est or 0.0 for f in self.measured)
+
+    def recoverable_cost_capped(self) -> float:
+        """Sum of per-finding estimates, capped at the observed total: estimates for
+        different rules overlap (the same minutes can be superseded, re-run and
+        rounded), so the plain sum can exceed what was actually billed."""
+        total = self.recoverable_cost_total()
+        return min(total, float(self.totals.cost)) if self.totals is not None else total
+
+    def recoverable_minutes_capped(self) -> float:
+        total = self.recoverable_minutes_total()
+        return min(total, float(self.totals.billed_minutes)) if self.totals is not None else total
 
     def monthly(self, amount: float) -> float:
         return amount * 30.0 / self.window_days if self.window_days else amount
@@ -165,10 +177,16 @@ class AuditResult:
                 "findings": len(self.findings),
                 "measured": len(self.measured),
                 "advisory": len(self.advisory),
-                "recoverable_minutes_est": round(self.recoverable_minutes_total(), 1),
-                "recoverable_cost_est": round(self.recoverable_cost_total(), 4),
-                "recoverable_cost_per_month_est": round(
-                    self.monthly(self.recoverable_cost_total()), 4
+                "recoverable_minutes_est_sum": round(self.recoverable_minutes_total(), 1),
+                "recoverable_cost_est_sum": round(self.recoverable_cost_total(), 4),
+                "recoverable_minutes_est_capped": round(self.recoverable_minutes_capped(), 1),
+                "recoverable_cost_est_capped": round(self.recoverable_cost_capped(), 4),
+                "recoverable_cost_per_month_est_capped": round(
+                    self.monthly(self.recoverable_cost_capped()), 4
+                ),
+                "recoverable_note": (
+                    "per-finding estimates overlap; the sum is not additive and the capped "
+                    "values are limited to the observed total"
                 ),
                 "worst_severity": (self.worst_severity() or Severity.LOW).value
                 if self.findings
@@ -311,6 +329,7 @@ def run_audit(opts: AuditOptions) -> AuditResult:
         history=history,
         window_days=opts.days,
         public_repo=history.public_repo if history else None,
+        ignore={r.upper() for r in opts.ignore},
     )
     findings = run_rules(ctx, STATIC_RULES)
     findings = join_findings(findings, ctx)

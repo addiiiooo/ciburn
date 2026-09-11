@@ -91,11 +91,13 @@ def totals_lines(result: AuditResult) -> list[str]:
             f"Plan {i.plan}: {i.included_minutes:,} included minutes cover ≈{money(float(i.covered_cost))} of "
             f"{money(float(i.gross_cost))}; net ≈{money(float(i.net_cost))} ({i.assumption})"
         )
-    rec = result.recoverable_cost_total()
-    lines.append(
-        f"Recoverable (sum of estimates, may overlap): {result.recoverable_minutes_total():,.0f} min · "
-        f"{money(rec)} (≈{money(result.monthly(rec))}/month)"
-    )
+    biggest = max(result.measured, key=lambda f: f.recoverable_cost_est or 0.0, default=None)
+    if biggest is not None and (biggest.recoverable_cost_est or biggest.recoverable_minutes_est):
+        lines.append(
+            "Recoverable: per-finding estimates overlap and are not additive; the largest single one is "
+            f"{biggest.rule_id} at {minutes(biggest.recoverable_minutes_est)} · "
+            f"{money(biggest.recoverable_cost_est)} (≈{money(result.monthly(biggest.recoverable_cost_est or 0.0))}/month)"
+        )
     return lines
 
 

@@ -91,6 +91,10 @@ def _common_options(fn: Any) -> Any:
             help="skip fetching commit file lists (W004 stays advisory)",
         ),
         click.option("--quiet", "-q", is_flag=True, help="no progress output on stderr"),
+        click.option(
+            "--ignore",
+            help="comma-separated rule ids to skip (files can also carry '# ciburn-ignore: W002')",
+        ),
     ]
     for o in reversed(opts):
         fn = o(fn)
@@ -136,6 +140,7 @@ def _build_options(
     no_commits: bool,
     quiet: bool,
     no_history: bool = False,
+    ignore: str | None = None,
 ) -> AuditOptions:
     if path is None and repo is None:
         path = Path.cwd()
@@ -158,6 +163,7 @@ def _build_options(
         label_overrides=overrides,
         max_job_runs=max_job_runs,
         fetch_commits=not no_commits,
+        ignore={r.strip() for r in ignore.split(",") if r.strip()} if ignore else set(),
         progress=_progress(quiet),
     )
 
@@ -218,6 +224,7 @@ def audit(
     max_job_runs: int | None,
     no_commits: bool,
     quiet: bool,
+    ignore: str | None,
     fmt: str,
     output: Path | None,
     fail_on: str,
@@ -242,6 +249,7 @@ def audit(
             no_commits,
             quiet,
             no_history,
+            ignore,
         )
         result = run_audit(opts)
     except Exception as exc:
@@ -277,6 +285,7 @@ def price(
     max_job_runs: int | None,
     no_commits: bool,
     quiet: bool,
+    ignore: str | None,
     compare: bool,
     fmt: str,
 ) -> None:
@@ -297,6 +306,7 @@ def price(
             max_job_runs,
             no_commits,
             quiet,
+            ignore=ignore,
         )
         code = run_price(opts, compare=compare, fmt=fmt)
     except Exception as exc:
@@ -368,6 +378,7 @@ def fix(
     max_job_runs: int | None,
     no_commits: bool,
     quiet: bool,
+    ignore: str | None,
     rule_ids: str | None,
     write: bool,
     dry_run: bool,
@@ -398,6 +409,7 @@ def fix(
             no_commits,
             quiet,
             no_history,
+            ignore,
         )
         result = run_audit(opts)
         wanted = {r.strip().upper() for r in rule_ids.split(",")} if rule_ids else None

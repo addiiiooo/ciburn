@@ -12,8 +12,14 @@ $ ciburn audit --repo pallets/flask --days 30
 ![ciburn audit of pallets/flask, rendered from real output](docs/demo.svg)
 
 The image above is the real terminal output of the command, rendered to SVG by
-[`scripts/render_demo.py`](scripts/render_demo.py). The plain-text version is in
-[`docs/example-pallets-flask.txt`](docs/example-pallets-flask.txt).
+[`scripts/render_demo.py`](scripts/render_demo.py). Plain-text versions of real
+runs: [`docs/example-pallets-flask.txt`](docs/example-pallets-flask.txt) (small
+Python project, wide short matrix) and
+[`docs/example-astral-sh-ruff.txt`](docs/example-astral-sh-ruff.txt) (large
+project on third-party runners: minutes observed, nothing priced), and
+[`docs/example-burntsushi-ripgrep.txt`](docs/example-burntsushi-ripgrep.txt)
+(Rust project with a cross-platform matrix on hosted runners). All three were
+produced by the wheel installed into an empty virtual environment.
 
 ## Why
 
@@ -85,12 +91,13 @@ output.
 Python 3.11+.
 
 ```bash
-uv tool install ciburn        # or: pipx install ciburn
-uvx ciburn --help             # run without installing
+git clone https://github.com/addiiiooo/ciburn && cd ciburn
+uv tool install .             # or: pipx install .   /   pip install .
+ciburn --help
 ```
 
-Until the first PyPI release, install from a checkout: `uv tool install .`
-or `pip install .`.
+Once the first release is on PyPI: `uv tool install ciburn`, `pipx install
+ciburn`, or `uvx ciburn`.
 
 ## Use
 
@@ -115,6 +122,9 @@ ciburn fix --rules W001,W003 > ciburn.patch && git apply ciburn.patch
 
 Exit codes: `0` clean (or below `--fail-on`), `1` findings at/above `--fail-on`,
 `2` error.
+
+Suppress a rule for one file with a comment anywhere in it
+(`# ciburn-ignore: W002, W011`) or globally with `--ignore W002`.
 
 **Tokens and limits.** Without a token ciburn uses GitHub's unauthenticated
 limit of 60 requests/hour and samples job data for at most 40 runs. Set

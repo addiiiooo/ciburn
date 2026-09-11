@@ -13,7 +13,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
 
 from ciburn.pricing import Pricing
-from test_static_rules import EXPECTED_DIR, FIXTURES, analyse, summary
+from test_static_rules import (  # type: ignore[import-not-found]
+    EXPECTED_DIR,
+    FIXTURES,
+    analyse,
+    summary,
+)
 
 
 def main() -> None:

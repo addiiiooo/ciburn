@@ -1,0 +1,978 @@
+ciburn — astral-sh/ruff · last 14 days · 2026-08-28 → 2026-09-11 · pricing model 2026
+Observed: 1,005 runs · 5,249 jobs · 12,074 billed minutes · $0.14 list price (≈$0.30/month)
+By runner: self-hosted:depot-ubuntu-24.04 3,287 min $0 · self-hosted:github-ubuntu-24.04-x86_64-4 3,021 min $0 · 
+self-hosted:codspeed-macro 1,377 min $0 · self-hosted:depot-ubuntu-22.04-16 1,306 min $0 · self-hosted:depot-ubuntu-22.04-32 951 min
+$0 · self-hosted:depot-ubuntu-24.04-4 428 min $0
+Unpriced: 12,051 min on self-hosted/custom runners (priced at $0 under model 2026)
+Rounding: per-job round-up to whole minutes added 1,813 min (15% of billed minutes)
+Recoverable: per-finding estimates overlap and are not additive; the largest single one is H009 at 94 min · $0 (≈$0/month)
+
+Where the minutes go (top job groups)                                                                 
+                                                                                                      
+  workflow                     job                          jobs   billed min   list price   p50 min  
+ ──────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ci.yaml                      benchmarks instrumented ty    671        3,362           $0       4.7  
+  ci.yaml                      benchmarks walltime           426        1,643           $0       4.4  
+  ci.yaml                      cargo test                    419        1,580           $0       3.3  
+  ci.yaml                      cargo fuzz build               84          544           $0       6.8  
+  ci.yaml                      cargo hawk                     84          506           $0       6.1  
+  ty-ecosystem-analyzer.yaml   analyze-shards                223          403           $0       1.2  
+  ci.yaml                      cargo publish dry-run          84          331           $0       3.4  
+  ci.yaml                      mkdocs                         84          244           $0       2.6  
+                                                                                                      
+MEASURED — from this repository's own run history (52)                                                                              
+                                                                                                                                    
+  rule   sev      where                          observed            recoverable (estimate)   conf     finding                      
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  H009   medium   ci.yaml#cargo fuzz build       94 min · n=19       94 min · $0 (≈$0/mo)     medium   `cargo fuzz build` (median   
+                                                                                                       6.8 min) ran in 19 runs      
+                                                                                                       where the cheap gate `all    
+                                                                                                       required checks passed`      
+                                                                                                       failed; it does not depend   
+                                                                                                       on it.                       
+                                                                                                       method: billed minutes of    
+                                                                                                       `cargo fuzz build` in runs   
+                                                                                                       where `all required checks   
+                                                                                                       passed` failed (the gate's   
+                                                                                                       own median is 0.1 min of     
+                                                                                                       added latency when it        
+                                                                                                       passes)                      
+                                                                                                       fix: Add `needs: ` so the    
+                                                                                                       expensive job waits for the  
+                                                                                                       cheap gate.                  
+  H009   medium   ci.yaml#cargo hawk             92 min · n=19       92 min · $0 (≈$0/mo)     medium   `cargo hawk` (median 6.1     
+                                                                                                       min) ran in 19 runs where    
+                                                                                                       the cheap gate `all          
+                                                                                                       required checks passed`      
+                                                                                                       failed; it does not depend   
+                                                                                                       on it.                       
+                                                                                                       method: billed minutes of    
+                                                                                                       `cargo hawk` in runs where   
+                                                                                                       `all required checks         
+                                                                                                       passed` failed (the gate's   
+                                                                                                       own median is 0.1 min of     
+                                                                                                       added latency when it        
+                                                                                                       passes)                      
+                                                                                                       fix: Add `needs: ` so the    
+                                                                                                       expensive job waits for the  
+                                                                                                       cheap gate.                  
+  H009   medium   ci.yaml#ecosystem              39 min · n=8        39 min · $0 (≈$0/mo)     low      `ecosystem` (median 5.3      
+                                                                                                       min) ran in 8 runs where     
+                                                                                                       the cheap gate `all          
+                                                                                                       required checks passed`      
+                                                                                                       failed; it does not depend   
+                                                                                                       on it.                       
+                                                                                                       method: billed minutes of    
+                                                                                                       `ecosystem` in runs where    
+                                                                                                       `all required checks         
+                                                                                                       passed` failed (the gate's   
+                                                                                                       own median is 0.1 min of     
+                                                                                                       added latency when it        
+                                                                                                       passes)                      
+                                                                                                       fix: Add `needs: ` so the    
+                                                                                                       expensive job waits for the  
+                                                                                                       cheap gate.                  
+  H009   medium   ci.yaml#fuzz parser            22 min · n=4        22 min · $0 (≈$0/mo)     low      `fuzz parser` (median 7.7    
+                                                                                                       min) ran in 4 runs where     
+                                                                                                       the cheap gate `all          
+                                                                                                       required checks passed`      
+                                                                                                       failed; it does not depend   
+                                                                                                       on it.                       
+                                                                                                       method: billed minutes of    
+                                                                                                       `fuzz parser` in runs where  
+                                                                                                       `all required checks         
+                                                                                                       passed` failed (the gate's   
+                                                                                                       own median is 0.1 min of     
+                                                                                                       added latency when it        
+                                                                                                       passes)                      
+                                                                                                       fix: Add `needs: ` so the    
+                                                                                                       expensive job waits for the  
+                                                                                                       cheap gate.                  
+  W001   medium   release.yml                    76 min · n=72       2 min · $0 (≈$0/mo)      high     .github/workflows/release.y  
+                                                                                                       ml runs on pull_request but  
+                                                                                                       has no `concurrency` block;  
+                                                                                                       every new push to a pull     
+                                                                                                       request starts a fresh run   
+                                                                                                       while the previous run       
+                                                                                                       keeps burning minutes until  
+                                                                                                       it finishes. In the last 14  
+                                                                                                       days, 2 of 72 PR runs were   
+                                                                                                       superseded while still       
+                                                                                                       running.                     
+                                                                                                       method: billed minutes of 2  
+                                                                                                       PR runs that a newer run on  
+                                                                                                       the same branch superseded   
+                                                                                                       before they finished (upper  
+                                                                                                       bound: cancellation would    
+                                                                                                       have saved the remainder,    
+                                                                                                       not the whole run) (job      
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Add a concurrency       
+                                                                                                       group keyed on the PR/ref    
+                                                                                                       with cancel-in-progress.     
+  W002   medium   build-binaries.yml#linux       32 min · n=4        0 min · $0 (≈$0/mo)      low      Job `linux` in               
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       Dependency installation is   
+                                                                                                       1% of this job's measured    
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (0 min across 2    
+                                                                                                       jobs, steps: Install LLVM    
+                                                                                                       profiling tools); a warm     
+                                                                                                       cache typically removes      
+                                                                                                       most of it (job data         
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#linux-aar   24 min · n=2        0 min · $0 (≈$0/mo)      low      Job `linux-aarch64` in       
+                  ch64                                                                                 .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       Dependency installation is   
+                                                                                                       1% of this job's measured    
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (0 min across 2    
+                                                                                                       jobs, steps: Install LLVM    
+                                                                                                       profiling tools); a warm     
+                                                                                                       cache typically removes      
+                                                                                                       most of it (job data         
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#linux-cro   61 min · n=10       not estimated            low      Job `linux-cross` in         
+                  ss                                                                                   .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       method: dependency-install   
+                                                                                                       step time could not be       
+                                                                                                       isolated from step names;    
+                                                                                                       no estimate (job data        
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#macos-aar   14 min · n=2        0 min · $0 (≈$0/mo)      low      Job `macos-aarch64` in       
+                  ch64                                                                                 .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`,       
+                                                                                                       `Test wheel - aarch64`) on   
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       Dependency installation is   
+                                                                                                       3% of this job's measured    
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (0 min across 2    
+                                                                                                       jobs, steps: Install LLVM    
+                                                                                                       profiling tools); a warm     
+                                                                                                       cache typically removes      
+                                                                                                       most of it (job data         
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#macos-x86   6 min · n=2         not estimated            low      Job `macos-x86_64` in        
+                  _64                                                                                  .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       method: dependency-install   
+                                                                                                       step time could not be       
+                                                                                                       isolated from step names;    
+                                                                                                       no estimate (job data        
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#musllinux   22 min · n=4        not estimated            low      Job `musllinux` in           
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       method: dependency-install   
+                                                                                                       step time could not be       
+                                                                                                       isolated from step names;    
+                                                                                                       no estimate (job data        
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#musllinux   22 min · n=4        not estimated            low      Job `musllinux-cross` in     
+                  -cross                                                                               .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       method: dependency-install   
+                                                                                                       step time could not be       
+                                                                                                       isolated from step names;    
+                                                                                                       no estimate (job data        
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#sdist       11 min · n=2        not estimated            low      Job `sdist` in               
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`) on    
+                                                                                                       every run and never          
+                                                                                                       restores a cache.            
+                                                                                                       method: dependency-install   
+                                                                                                       step time could not be       
+                                                                                                       isolated from step names;    
+                                                                                                       no estimate (job data        
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   build-binaries.yml#windows     42 min · n=6        0 min · $0 (≈$0/mo)      low      Job `windows` in             
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml installs           
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-python`,       
+                                                                                                       `Test wheel`) on every run   
+                                                                                                       and never restores a cache.  
+                                                                                                       Dependency installation is   
+                                                                                                       1% of this job's measured    
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (0 min across 2    
+                                                                                                       jobs, steps: Install LLVM    
+                                                                                                       profiling tools); a warm     
+                                                                                                       cache typically removes      
+                                                                                                       most of it (job data         
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `cache: pip` on     
+                                                                                                       `actions/setup-python`, or   
+                                                                                                       cache `~/.cache/pip` with    
+                                                                                                       `actions/cache`.             
+  W002   medium   publish-ty-playground.yml#bu   84 min · n=8        1 min · $0 (≈$0/mo)      low      Job `build` in               
+                  ild                                                                                  .github/workflows/publish-t  
+                                                                                                       y-playground.yml installs    
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-node`,         
+                                                                                                       `Install Node                
+                                                                                                       dependencies`) on every run  
+                                                                                                       and never restores a cache.  
+                                                                                                       Dependency installation is   
+                                                                                                       3% of this job's measured    
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (2 min across 8    
+                                                                                                       jobs, steps: Install Node    
+                                                                                                       dependencies, Install Rust   
+                                                                                                       toolchain); a warm cache     
+                                                                                                       typically removes most of    
+                                                                                                       it (job data available for   
+                                                                                                       347/1005 of runs in the      
+                                                                                                       window)                      
+                                                                                                       fix: Set `cache:             
+                                                                                                       npm|yarn|pnpm` on            
+                                                                                                       `actions/setup-node`.        
+  W002   medium   publish-ty-playground.yml#pu   8 min · n=8         0 min · $0 (≈$0/mo)      low      Job `publish` in             
+                  blish                                                                                .github/workflows/publish-t  
+                                                                                                       y-playground.yml installs    
+                                                                                                       dependencies (`Run           
+                                                                                                       actions/setup-node`,         
+                                                                                                       `Install deployment          
+                                                                                                       dependencies`) on every run  
+                                                                                                       and never restores a cache.  
+                                                                                                       Dependency installation is   
+                                                                                                       16% of this job's measured   
+                                                                                                       time.                        
+                                                                                                       method: half of the          
+                                                                                                       measured dependency-install  
+                                                                                                       step time (1 min across 8    
+                                                                                                       jobs, steps: Install         
+                                                                                                       deployment dependencies); a  
+                                                                                                       warm cache typically         
+                                                                                                       removes most of it (job      
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `cache:             
+                                                                                                       npm|yarn|pnpm` on            
+                                                                                                       `actions/setup-node`.        
+  W003   medium   build-binaries.yml#linux       32 min · n=4        0 min · $0 (≈$0/mo)      low      Job `linux` in               
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 7.4 min, p95 8.8 min,    
+                                                                                                       max 8.8 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 14-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 4  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       14` (1.5x the observed p95   
+                                                                                                       of 8.8 min).                 
+  W003   medium   build-binaries.yml#linux-aar   24 min · n=2        0 min · $0 (≈$0/mo)      low      Job `linux-aarch64` in       
+                  ch64                                                                                 .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 11.7 min, p95 11.9 min,  
+                                                                                                       max 11.9 min.                
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 18-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 2  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       18` (1.5x the observed p95   
+                                                                                                       of 11.9 min).                
+  W003   medium   build-binaries.yml#linux-cro   61 min · n=10       0 min · $0 (≈$0/mo)      medium   Job `linux-cross` in         
+                  ss                                                                                   .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 5.8 min, p95 6.5 min,    
+                                                                                                       max 6.5 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 10-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of    
+                                                                                                       10 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       10` (1.5x the observed p95   
+                                                                                                       of 6.5 min).                 
+  W003   medium   build-binaries.yml#macos-aar   14 min · n=2        0 min · $0 (≈$0/mo)      low      Job `macos-aarch64` in       
+                  ch64                                                                                 .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 6.5 min, p95 6.7 min,    
+                                                                                                       max 6.7 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 10-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 2  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       10` (1.5x the observed p95   
+                                                                                                       of 6.7 min).                 
+  W003   medium   build-binaries.yml#macos-x86   6 min · n=2         0 min · $0 (≈$0/mo)      low      Job `macos-x86_64` in        
+                  _64                                                                                  .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 2.9 min, p95 2.9 min,    
+                                                                                                       max 2.9 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of 2  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 2.9 min).                 
+  W003   medium   build-binaries.yml#musllinux   22 min · n=4        0 min · $0 (≈$0/mo)      low      Job `musllinux` in           
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 4.6 min, p95 6.5 min,    
+                                                                                                       max 6.5 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 10-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 4  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       10` (1.5x the observed p95   
+                                                                                                       of 6.5 min).                 
+  W003   medium   build-binaries.yml#musllinux   22 min · n=4        0 min · $0 (≈$0/mo)      low      Job `musllinux-cross` in     
+                  -cross                                                                               .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 5.1 min, p95 5.2 min,    
+                                                                                                       max 5.2 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 8-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of 4  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       8` (1.5x the observed p95    
+                                                                                                       of 5.2 min).                 
+  W003   medium   build-binaries.yml#sdist       11 min · n=2        0 min · $0 (≈$0/mo)      low      Job `sdist` in               
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 4.8 min, p95 5.2 min,    
+                                                                                                       max 5.2 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 8-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of 2  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       8` (1.5x the observed p95    
+                                                                                                       of 5.2 min).                 
+  W003   medium   build-binaries.yml#windows     42 min · n=6        0 min · $0 (≈$0/mo)      low      Job `windows` in             
+                                                                                                       .github/workflows/build-bin  
+                                                                                                       aries.yml has no             
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 4.9 min, p95 10.4 min,   
+                                                                                                       max 10.4 min.                
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 16-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 6  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       16` (1.5x the observed p95   
+                                                                                                       of 10.4 min).                
+  W003   medium   ci.yaml#cargo-shear            84 min · n=83       0 min · $0 (≈$0/mo)      high     Job `cargo-shear` in         
+                                                                                                       .github/workflows/ci.yaml    
+                                                                                                       has no `timeout-minutes`; a  
+                                                                                                       hung step bills up to 360    
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 0.4 min, p95 0.5 min,    
+                                                                                                       max 1.0 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of    
+                                                                                                       83 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 0.5 min).                 
+  W003   medium   ci.yaml#determine_changes      84 min · n=84       0 min · $0 (≈$0/mo)      high     Job `determine_changes` in   
+                                                                                                       .github/workflows/ci.yaml    
+                                                                                                       has no `timeout-minutes`; a  
+                                                                                                       hung step bills up to 360    
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 0.3 min, p95 0.3 min,    
+                                                                                                       max 0.3 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of    
+                                                                                                       84 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 0.3 min).                 
+  W003   medium   ci.yaml#required-checks-pass   83 min · n=83       0 min · $0 (≈$0/mo)      high     Job                          
+                  ed                                                                                   `required-checks-passed` in  
+                                                                                                       .github/workflows/ci.yaml    
+                                                                                                       has no `timeout-minutes`; a  
+                                                                                                       hung step bills up to 360    
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 0.1 min, p95 0.1 min,    
+                                                                                                       max 0.1 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of    
+                                                                                                       83 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 0.1 min).                 
+  W003   medium   ci.yaml#ty-completion-evalua   146 min · n=68      1 min · $0 (≈$0/mo)      high     Job                          
+                  tion                                                                                 `ty-completion-evaluation`   
+                                                                                                       in                           
+                                                                                                       .github/workflows/ci.yaml    
+                                                                                                       has no `timeout-minutes`; a  
+                                                                                                       hung step bills up to 360    
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 1.6 min, p95 2.1 min,    
+                                                                                                       max 5.1 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 1 of    
+                                                                                                       68 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 2.1 min).                 
+  W003   medium   publish-ty-playground.yml#bu   84 min · n=8        0 min · $0 (≈$0/mo)      low      Job `build` in               
+                  ild                                                                                  .github/workflows/publish-t  
+                                                                                                       y-playground.yml has no      
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 10.0 min, p95 10.9 min,  
+                                                                                                       max 10.9 min.                
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 17-minute timeout   
+                                                                                                       (1.5x observed p95); 0 of 8  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       17` (1.5x the observed p95   
+                                                                                                       of 10.9 min).                
+  W003   medium   publish-ty-playground.yml#pu   8 min · n=8         0 min · $0 (≈$0/mo)      low      Job `publish` in             
+                  blish                                                                                .github/workflows/publish-t  
+                                                                                                       y-playground.yml has no      
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 0.5 min, p95 0.6 min,    
+                                                                                                       max 0.6 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of 8  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 0.6 min).                 
+  W003   medium   release-prepare.yml#prepare-   4 min · n=2         0 min · $0 (≈$0/mo)      low      Job `prepare-release` in     
+                  release                                                                              .github/workflows/release-p  
+                                                                                                       repare.yml has no            
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 1.6 min, p95 1.9 min,    
+                                                                                                       max 1.9 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of 2  
+                                                                                                       jobs exceeded it (job data   
+                                                                                                       available for 347/1005 of    
+                                                                                                       runs in the window)          
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 1.9 min).                 
+  W003   medium   release.yml#plan               76 min · n=72       0 min · $0 (≈$0/mo)      high     Job `plan` in                
+                                                                                                       .github/workflows/release.y  
+                                                                                                       ml has no                    
+                                                                                                       `timeout-minutes`; a hung    
+                                                                                                       step bills up to 360         
+                                                                                                       minutes per leg before       
+                                                                                                       GitHub cancels it. Observed  
+                                                                                                       p50 0.7 min, p95 1.0 min,    
+                                                                                                       max 1.1 min.                 
+                                                                                                       method: minutes billed       
+                                                                                                       beyond a 5-minute timeout    
+                                                                                                       (1.5x observed p95); 0 of    
+                                                                                                       72 jobs exceeded it (job     
+                                                                                                       data available for 347/1005  
+                                                                                                       of runs in the window)       
+                                                                                                       fix: Set `timeout-minutes:   
+                                                                                                       5` (1.5x the observed p95    
+                                                                                                       of 1.0 min).                 
+  H003   low      ci.yaml#Determine changes      83 min · n=83       42 min · $0 (≈$0/mo)     low      `Determine changes`          
+                                                                                                       succeeded in all 83          
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 83       
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      ci.yaml#Fuzz for new ty        211 min · n=49      106 min · $0 (≈$0/mo)    low      `Fuzz for new ty panics`     
+                  panics                                                                               succeeded in all 49          
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 211      
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      ci.yaml#benchmarks walltime    1,536 min · n=347   768 min · $0 (≈$0/mo)    low      `benchmarks walltime`        
+                                                                                                       succeeded in all 347         
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 1536     
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      ci.yaml#shellcheck             84 min · n=82       42 min · $0 (≈$0/mo)     low      `shellcheck` succeeded in    
+                                                                                                       all 82 completed runs in     
+                                                                                                       the window and consumed 84   
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      ci.yaml#ty completion          138 min · n=66      69 min · $0 (≈$0/mo)     low      `ty completion evaluation`   
+                  evaluation                                                                           succeeded in all 66          
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 138      
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      memory_report.yaml#Compute     173 min · n=53      86 min · $0 (≈$0/mo)     low      `Compute memory usage diff`  
+                  memory usage diff                                                                    succeeded in all 53          
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 173      
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+  H003   low      release.yml#plan               76 min · n=72       38 min · $0 (≈$0/mo)     low      `plan` succeeded in all 72   
+                                                                                                       completed runs in the        
+                                                                                                       window and consumed 76       
+                                                                                                       billed minutes; it has       
+                                                                                                       caught nothing in 14 days.   
+                                                                                                       method: scenario: running    
+                                                                                                       the job on half of the       
+                                                                                                       events (e.g. main only)      
+                                                                                                       halves its minutes; whether  
+                                                                                                       it would have caught a       
+                                                                                                       regression is unknowable     
+                                                                                                       from history                 
+                                                                                                       fix: Run it less often       
+                                                                                                       (main branch only, nightly,  
+                                                                                                       or a subset of the matrix)   
+                                                                                                       and watch whether it ever    
+                                                                                                       fails.                       
+                                                                                                                                    
+ADVISORY — configuration only, no history evidence (35)                                                                             
+                                                                                                                                    
+  rule   sev      where                                 finding                                fix                                  
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  W002   medium   publish-playground.yml#build          Job `build` in                         Set `cache: npm|yarn|pnpm` on        
+                                                        .github/workflows/publish-playground   `actions/setup-node`.                
+                                                        .yml installs dependencies (`Run                                            
+                                                        actions/setup-node`, `Install Node                                          
+                                                        dependencies`) on every run and                                             
+                                                        never restores a cache.                                                     
+  W002   medium   publish-playground.yml#publish        Job `publish` in                       Set `cache: npm|yarn|pnpm` on        
+                                                        .github/workflows/publish-playground   `actions/setup-node`.                
+                                                        .yml installs dependencies (`Run                                            
+                                                        actions/setup-node`, `Install                                               
+                                                        deployment dependencies`) on every                                          
+                                                        run and never restores a cache.                                             
+  W002   medium   publish-wasm.yml#publish              Job `publish` in                       Set `cache: npm|yarn|pnpm` on        
+                                                        .github/workflows/publish-wasm.yml     `actions/setup-node`.                
+                                                        installs dependencies (`Run                                                 
+                                                        actions/setup-node`) on every run                                           
+                                                        and never restores a cache.                                                 
+  W003   medium   build-docker.yml#docker-build         Job `docker-build` in                  Set `timeout-minutes` to roughly     
+                                                        .github/workflows/build-docker.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   build-docker.yml#docker-publish       Job `docker-publish` in                Set `timeout-minutes` to roughly     
+                                                        .github/workflows/build-docker.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   build-docker.yml#docker-publish-ext   Job `docker-publish-extra` in          Set `timeout-minutes` to roughly     
+                  ra                                    .github/workflows/build-docker.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   build-docker.yml#docker-republish     Job `docker-republish` in              Set `timeout-minutes` to roughly     
+                                                        .github/workflows/build-docker.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   build-wasm.yml#build                  Job `build` in                         Set `timeout-minutes` to roughly     
+                                                        .github/workflows/build-wasm.yml has   1.5x the job's p95 runtime.          
+                                                        no `timeout-minutes`; a hung step                                           
+                                                        bills up to 360 minutes per leg                                             
+                                                        before GitHub cancels it.                                                   
+  W003   medium   daily_fuzz.yaml#create-issue-on-fai   Job `create-issue-on-failure` in       Set `timeout-minutes` to roughly     
+                  lure                                  .github/workflows/daily_fuzz.yaml      1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   notify-dependents.yml#update-depend   Job `update-dependents` in             Set `timeout-minutes` to roughly     
+                  ents                                  .github/workflows/notify-dependents.   1.5x the job's p95 runtime.          
+                                                        yml has no `timeout-minutes`; a hung                                        
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-crates.yml#crates-publish-r   Job `crates-publish-ruff` in           Set `timeout-minutes` to roughly     
+                  uff                                   .github/workflows/publish-crates.yml   1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-docs.yml#mkdocs               Job `mkdocs` in                        Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-docs.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-mirror.yml#publish-mirror     Job `publish-mirror` in                Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-mirror.yml   1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-playground.yml#build          Job `build` in                         Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-playground   1.5x the job's p95 runtime.          
+                                                        .yml has no `timeout-minutes`; a                                            
+                                                        hung step bills up to 360 minutes                                           
+                                                        per leg before GitHub cancels it.                                           
+  W003   medium   publish-playground.yml#publish        Job `publish` in                       Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-playground   1.5x the job's p95 runtime.          
+                                                        .yml has no `timeout-minutes`; a                                            
+                                                        hung step bills up to 360 minutes                                           
+                                                        per leg before GitHub cancels it.                                           
+  W003   medium   publish-pypi.yml#pypi-publish         Job `pypi-publish` in                  Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-pypi.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-versions.yml#publish-versio   Job `publish-versions` in              Set `timeout-minutes` to roughly     
+                  ns                                    .github/workflows/publish-versions.y   1.5x the job's p95 runtime.          
+                                                        ml has no `timeout-minutes`; a hung                                         
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   publish-wasm.yml#publish              Job `publish` in                       Set `timeout-minutes` to roughly     
+                                                        .github/workflows/publish-wasm.yml     1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W003   medium   release.yml#announce                  Job `announce` in                      Set `timeout-minutes` to roughly     
+                                                        .github/workflows/release.yml has no   1.5x the job's p95 runtime.          
+                                                        `timeout-minutes`; a hung step bills                                        
+                                                        up to 360 minutes per leg before                                            
+                                                        GitHub cancels it.                                                          
+  W003   medium   release.yml#build-global-artifacts    Job `build-global-artifacts` in        Set `timeout-minutes` to roughly     
+                                                        .github/workflows/release.yml has no   1.5x the job's p95 runtime.          
+                                                        `timeout-minutes`; a hung step bills                                        
+                                                        up to 360 minutes per leg before                                            
+                                                        GitHub cancels it.                                                          
+  W003   medium   release.yml#generate-checksum-manif   Job `generate-checksum-manifest` in    Set `timeout-minutes` to roughly     
+                  est                                   .github/workflows/release.yml has no   1.5x the job's p95 runtime.          
+                                                        `timeout-minutes`; a hung step bills                                        
+                                                        up to 360 minutes per leg before                                            
+                                                        GitHub cancels it.                                                          
+  W003   medium   release.yml#host                      Job `host` in                          Set `timeout-minutes` to roughly     
+                                                        .github/workflows/release.yml has no   1.5x the job's p95 runtime.          
+                                                        `timeout-minutes`; a hung step bills                                        
+                                                        up to 360 minutes per leg before                                            
+                                                        GitHub cancels it.                                                          
+  W003   medium   release.yml#release-gate              Job `release-gate` in                  Set `timeout-minutes` to roughly     
+                                                        .github/workflows/release.yml has no   1.5x the job's p95 runtime.          
+                                                        `timeout-minutes`; a hung step bills                                        
+                                                        up to 360 minutes per leg before                                            
+                                                        GitHub cancels it.                                                          
+  W003   medium   sync_typeshed.yaml#create-issue-on-   Job `create-issue-on-failure` in       Set `timeout-minutes` to roughly     
+                  failure                               .github/workflows/sync_typeshed.yaml   1.5x the job's p95 runtime.          
+                                                        has no `timeout-minutes`; a hung                                            
+                                                        step bills up to 360 minutes per leg                                        
+                                                        before GitHub cancels it.                                                   
+  W011   low      build-binaries.yml#linux              Job `linux` in                         Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#linux-aarch64      Job `linux-aarch64` in                 Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#linux-cross        Job `linux-cross` in                   Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#macos-aarch64      Job `macos-aarch64` in                 Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#macos-x86_64       Job `macos-x86_64` in                  Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#musllinux          Job `musllinux` in                     Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#musllinux-cross    Job `musllinux-cross` in               Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#sdist              Job `sdist` in                         Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      build-binaries.yml#windows            Job `windows` in                       Narrow `path` to what is needed and  
+                                                        .github/workflows/build-binaries.yml   set `retention-days` (e.g. 7).       
+                                                        uploads `dist` as an artifact with                                          
+                                                        the default retention (up to 90                                             
+                                                        days); broad paths accrue storage                                           
+                                                        charges long after the run is                                               
+                                                        forgotten.                                                                  
+  W011   low      ty-ecosystem-analyzer.yaml#generate   Job `generate-report` in               Narrow `path` to what is needed and  
+                  -report                               .github/workflows/ty-ecosystem-analy   set `retention-days` (e.g. 7).       
+                                                        zer.yaml uploads `dist/` as an                                              
+                                                        artifact with the default retention                                         
+                                                        (up to 90 days); broad paths accrue                                         
+                                                        storage charges long after the run                                          
+                                                        is forgotten.                                                               
+  W011   low      ty-ecosystem-report.yaml#ty-ecosyst   Job `ty-ecosystem-report` in           Narrow `path` to what is needed and  
+                  em-report                             .github/workflows/ty-ecosystem-repor   set `retention-days` (e.g. 7).       
+                                                        t.yaml uploads `dist/` as an                                                
+                                                        artifact with the default retention                                         
+                                                        (up to 90 days); broad paths accrue                                         
+                                                        storage charges long after the run                                          
+                                                        is forgotten.                                                               
+                                                                                                                                    
+
+note: Public repository: standard-runner minutes are free on GitHub. Costs are the private-repository list-price equivalent.
+note: Job-level data covers 347 of 1005 runs in the window (sampled).
+
+Estimates are labelled as such; each carries its method (see --format json or md). Rates: 
+https://docs.github.com/en/billing/reference/actions-runner-pricing (fetched 2026-09-11).

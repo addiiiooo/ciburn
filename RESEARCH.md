@@ -29,8 +29,9 @@ Academic prior art:
   of GitHub Actions*, ICSE 2024. PDF:
   <https://software-lab.org/publications/icse2024_workflows.pdf>. Dataset:
   952 repositories, 1.3 million workflow runs, 30 months.
-- *On the Reruns of GitHub Actions Workflows*, TOSEM 2026,
-  <https://dl.acm.org/doi/10.1145/3795771> (rerun behaviour; relevant to H006).
+- *On the Reruns of GitHub Actions Workflows*, ACM TOSEM,
+  <https://dl.acm.org/doi/10.1145/3795771> (rerun behaviour; relevant to H006;
+  found via search, not read in full).
 
 **Verdict:** no mature, actively maintained tool (>1,000 stars, commits within 90
 days) does history-attributed cost analysis. `actionlint` and `zizmor` are the

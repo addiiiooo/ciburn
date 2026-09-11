@@ -236,3 +236,23 @@ jobs:
     fs = run_rules(ctx, STATIC_RULES)
     assert [f.job for f in fs if f.rule_id == "W007"] == ["b"]  # `a` skipped: expression runner
     assert [f.job for f in fs if f.rule_id == "W011"] == ["b"]
+
+
+def test_ignore_comment_and_flag(pricing: Pricing) -> None:
+    text = """
+# ciburn-ignore: W003, w001
+on: pull_request
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - run: pytest
+"""
+    wf = parse_workflow(text, "x.yml")
+    assert wf.ignored_rules == {"W003", "W001"}
+    ctx = Context(workflows=[wf], pricing=pricing, model=pricing.model("2026"))
+    ids = {f.rule_id for f in run_rules(ctx, STATIC_RULES)}
+    assert "W003" not in ids
+    assert "W001" not in ids
+    ctx.ignore = {"W010"}
+    assert "W010" not in {f.rule_id for f in run_rules(ctx, STATIC_RULES)}

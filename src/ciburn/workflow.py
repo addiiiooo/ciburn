@@ -15,6 +15,7 @@ from typing import Any
 import yaml
 
 EXPR_RE = re.compile(r"\$\{\{.*?\}\}", re.DOTALL)
+IGNORE_RE = re.compile(r"#[ \t]*ciburn-ignore[ \t]*:[ \t]*([A-Za-z0-9_, \t]+)")
 WORKFLOW_GLOBS = ("*.yml", "*.yaml")
 
 
@@ -120,6 +121,14 @@ class Workflow:
     parse_error: str | None = None
     raw: dict[str, Any] = field(repr=False, default_factory=dict)
     env: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def ignored_rules(self) -> set[str]:
+        """Rule ids listed in ``# ciburn-ignore: W002, W003`` comments anywhere in the file."""
+        out: set[str] = set()
+        for m in IGNORE_RE.finditer(self.source):
+            out.update(r.strip().upper() for r in m.group(1).split(",") if r.strip())
+        return out
 
     @property
     def events(self) -> list[str]:
