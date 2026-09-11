@@ -6,7 +6,7 @@ has read nothing else. Newest at the bottom.
 ## Gate 1 — Phase 0 research (2026-09-11 18:00–19:00 UTC)
 
 **Built:** `RESEARCH.md`, `DECISIONS.md` (D001–D008), `src/ciburn/data/pricing.yaml`
-(three models, 36 SKUs each, label→SKU regexes, limits, quotas, rounding rule),
+(three models, 35 SKUs each, label→SKU regexes, limits, quotas, rounding rule),
 recorded API fixtures in `tests/fixtures/api/` (runs, jobs, workflows, timing,
 billing-404, rate-limit headers), `.gitignore`, `LICENSE`.
 
@@ -27,3 +27,21 @@ scheduled runs fail".
 **Environment for the next phase:** Homebrew `python3.11`, `uv 0.12.13`; the
 API token is obtained per-command with
 `git credential fill` (see D001) and exported as `GITHUB_TOKEN` in-process only.
+
+## Gate 2 — Skeleton, packaging, pricing engine, CI (2026-09-11 19:20 UTC)
+
+**Built:** `pyproject.toml` (hatchling, `ciburn` script, dev dependency group,
+ruff/mypy strict/pytest/coverage config), `src/ciburn/{__init__,cli,pricing}.py`,
+`tests/{conftest,test_pricing,test_pricing_freshness}.py`,
+`.github/workflows/ci.yml` (lint; test matrix ubuntu/macos/windows × 3.11–3.13
+with a 90 % coverage floor on `ciburn.rules`, `ciburn.pricing`, `ciburn.join`;
+wheel build + clean-venv install smoke test). The CI workflow itself carries
+`concurrency` + `cancel-in-progress`, `timeout-minutes` on every job, caching
+via `setup-uv`, and `paths-ignore` for docs, so it passes ciburn's own rules.
+
+**Verified locally:** `ruff check`, `ruff format --check`, `mypy --strict`, and
+53 tests pass on Python 3.11.15. Property tests cover non-negativity,
+monotonicity and the 0/1/59/60/61-second rounding boundaries.
+
+**Remains:** static analyzer (Gate 3), history ingestion (Gate 4), join and
+reporters (Gate 6), fix + action (Gate 7), corpus (Gate 8), hardening.

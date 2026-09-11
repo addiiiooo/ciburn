@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "launch/**"
+      - "dataset/**"
+      - "REPORT.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "launch/**"
+      - "dataset/**"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint (ruff, mypy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --group dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+
+  test:
+    name: test (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python }}
+      - run: uv sync --group dev
+      - name: pytest with coverage floor on analyzer, pricing and join modules
+        run: >-
+          uv run pytest
+          --cov=ciburn.rules --cov=ciburn.pricing --cov=ciburn.join
+          --cov-report=term-missing --cov-fail-under=90
+
+  package:
+    name: build wheel, clean install, smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv build
+      - name: install wheel into an empty venv and run it
+        run: |
+          uv venv /tmp/clean --python 3.12
+          uv pip install --python /tmp/clean/bin/python dist/*.whl
+          /tmp/clean/bin/ciburn --version
