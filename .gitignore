@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.python-version
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# ciburn local caches (never commit history databases)
+*.sqlite
+*.sqlite3
+*.db
+.ciburn/
+.ciburn-cache/
+
+# secrets / env
+.env
+.env.*
+*.pem
+*.token
+
+# corpus scan working files (only the finished dataset/ is committed)
+scripts/.checkpoints/
+scratch/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+*.swp

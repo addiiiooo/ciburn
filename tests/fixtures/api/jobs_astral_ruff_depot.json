@@ -1,0 +1,116 @@
+{
+  "jobs": [
+    {
+      "check_run_url": "https://api.github.com/repos/astral-sh/ruff/check-runs/103367689311",
+      "completed_at": null,
+      "conclusion": null,
+      "created_at": "2026-09-11T18:02:33Z",
+      "head_branch": "charlie/fix-generic-mro",
+      "head_sha": "5ce4cbee7d5506bd116433fc2a21fb9b2d121ae2",
+      "html_url": "https://github.com/astral-sh/ruff/actions/runs/34631050428/job/103367689311",
+      "id": 103367689311,
+      "labels": [
+        "depot-ubuntu-24.04-4"
+      ],
+      "name": "plan",
+      "node_id": "CR_kwDOHy0Bzc8AAAAYETHEXw",
+      "run_attempt": 1,
+      "run_id": 34631050428,
+      "run_url": "https://api.github.com/repos/astral-sh/ruff/actions/runs/34631050428",
+      "runner_group_id": 1,
+      "runner_group_name": "default",
+      "runner_id": 2371772,
+      "runner_name": "depot-vb0d207rjs",
+      "started_at": "2026-09-11T18:02:35Z",
+      "status": "in_progress",
+      "steps": [
+        {
+          "completed_at": "2026-09-11T18:03:00Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "started_at": "2026-09-11T18:02:59Z",
+          "status": "completed"
+        },
+        {
+          "completed_at": "2026-09-11T18:03:06Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+          "number": 2,
+          "started_at": "2026-09-11T18:03:00Z",
+          "status": "completed"
+        },
+        {
+          "completed_at": "2026-09-11T18:03:07Z",
+          "conclusion": "success",
+          "name": "Install dist",
+          "number": 3,
+          "started_at": "2026-09-11T18:03:06Z",
+          "status": "completed"
+        },
+        {
+          "completed_at": "2026-09-11T18:03:08Z",
+          "conclusion": "success",
+          "name": "Cache dist",
+          "number": 4,
+          "started_at": "2026-09-11T18:03:07Z",
+          "status": "completed"
+        },
+        {
+          "completed_at": null,
+          "conclusion": null,
+          "name": "Run dist_args=(plan)",
+          "number": 5,
+          "started_at": "2026-09-11T18:03:08Z",
+          "status": "in_progress"
+        },
+        {
+          "completed_at": null,
+          "conclusion": null,
+          "name": "Upload dist-manifest.json",
+          "number": 6,
+          "started_at": null,
+          "status": "pending"
+        },
+        {
+          "completed_at": null,
+          "conclusion": null,
+          "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+          "number": 12,
+          "started_at": null,
+          "status": "pending"
+        }
+      ],
+      "url": "https://api.github.com/repos/astral-sh/ruff/actions/jobs/103367689311",
+      "workflow_name": "Release"
+    },
+    {
+      "check_run_url": "https://api.github.com/repos/astral-sh/ruff/check-runs/103367690810",
+      "completed_at": "2026-09-11T18:02:33Z",
+      "conclusion": "skipped",
+      "created_at": "2026-09-11T18:02:33Z",
+      "head_branch": "charlie/fix-generic-mro",
+      "head_sha": "5ce4cbee7d5506bd116433fc2a21fb9b2d121ae2",
+      "html_url": "https://github.com/astral-sh/ruff/actions/runs/34631050428/job/103367690810",
+      "id": 103367690810,
+      "labels": [
+        "github-ubuntu-24.04-x86_64-4"
+      ],
+      "name": "release-gate",
+      "node_id": "CR_kwDOHy0Bzc8AAAAYETHKOg",
+      "run_attempt": 1,
+      "run_id": 34631050428,
+      "run_url": "https://api.github.com/repos/astral-sh/ruff/actions/runs/34631050428",
+      "runner_group_id": null,
+      "runner_group_name": null,
+      "runner_id": null,
+      "runner_name": null,
+      "started_at": "2026-09-11T18:02:33Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://api.github.com/repos/astral-sh/ruff/actions/jobs/103367690810",
+      "workflow_name": "Release"
+    }
+  ],
+  "total_count": 2
+}

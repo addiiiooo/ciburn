@@ -1,0 +1,213 @@
+# ciburn pricing data. Every number here was read from a primary GitHub source
+# on the date in `fetched_at`. Nothing in the code hardcodes a price; the
+# pricing engine loads this file. `tests/test_pricing_freshness.py` fails when
+# `fetched_at` is older than 90 days so stale prices cannot ship silently.
+#
+# Verification notes for each block are in RESEARCH.md.
+schema_version: 1
+fetched_at: "2026-09-11T18:40:00Z"
+currency: USD
+
+rounding:
+  rule: per_job_round_up_to_whole_minute
+  statement: "GitHub rounds the minutes and partial minutes each job uses up to the nearest whole minute."
+  source_url: https://docs.github.com/en/billing/reference/actions-runner-pricing
+  source_git: https://github.com/github/docs/blob/main/content/billing/reference/actions-runner-pricing.md
+  fetched_at: "2026-09-11T18:40:00Z"
+  verified: true
+
+free_usage:
+  # "GitHub Actions usage is free for self-hosted runners and for public
+  # repositories that use standard GitHub-hosted runners."
+  public_repositories_standard_runners: true
+  self_hosted_runners: true
+  larger_runners_public_repositories: false  # "Larger runners are always charged for, even when used by public repositories"
+  source_url: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+  fetched_at: "2026-09-11T18:40:00Z"
+  verified: true
+
+included_minutes:
+  # Minutes per month for standard GitHub-hosted runners in private repos.
+  # "Included minutes cannot be used for larger runners."
+  source_url: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+  fetched_at: "2026-09-11T18:40:00Z"
+  verified: true
+  plans:
+    free: 2000
+    pro: 3000
+    free_org: 2000
+    team: 3000
+    enterprise: 50000
+  # How non-Linux standard minutes draw down the included quota is NOT stated
+  # on a current primary page (the legacy 2x/10x multiplier table was replaced
+  # by per-SKU rates in 2025). ciburn therefore applies the quota only when the
+  # user passes --plan, and draws it down at list-price ratio
+  # (minutes * sku_rate / linux_2core_rate). That ratio is an ASSUMPTION and is
+  # labelled as such in every report. See DECISIONS.md D005.
+  drawdown_rule: list_price_ratio
+  drawdown_rule_verified: false
+
+limits:
+  default_job_timeout_minutes: 360
+  ubuntu_slim_job_timeout_minutes: 15
+  max_matrix_jobs: 256
+  source_url: https://docs.github.com/en/actions/reference/limits
+  ubuntu_slim_source_url: https://github.blog/changelog/2026-01-22-1-vcpu-linux-runner-now-generally-available-in-github-actions/
+  fetched_at: "2026-09-11T18:40:00Z"
+  verified: true
+
+# Label -> SKU mapping for GitHub-hosted runners. Patterns are Python regexes
+# matched against each job label (case-insensitive). First match wins.
+# Linux/Windows *larger* runners use org-defined custom labels and cannot be
+# inferred from the label alone; they fall through to `unknown` and are
+# reported as unpriced minutes unless the user supplies --label-sku.
+label_patterns:
+  source_url: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+  larger_runner_source_url: https://docs.github.com/en/actions/reference/runners/larger-runners
+  fetched_at: "2026-09-11T18:40:00Z"
+  rules:
+    - pattern: '^ubuntu-slim$'
+      sku: actions_linux_slim
+    - pattern: '^ubuntu-(latest|\d\d\.\d\d)-arm$'
+      sku: actions_linux_arm
+    - pattern: '^ubuntu-(latest|\d\d\.\d\d)$'
+      sku: actions_linux
+    - pattern: '^windows-11-arm$'
+      sku: actions_windows_arm
+    - pattern: '^windows-(latest|\d{4})$'
+      sku: actions_windows
+    - pattern: '^macos-(latest|\d+)-large$'
+      sku: macos_l
+    - pattern: '^(macos-(latest|\d+)|xcode-\d+)-xlarge$'
+      sku: macos_xl
+    - pattern: '^macos-(latest|\d+)(-intel)?$'
+      sku: actions_macos
+
+models:
+  "2026":
+    name: "GitHub-hosted runner rates in effect from 2026-01-01 (current)"
+    effective_from: "2026-01-01"
+    in_effect: true
+    source_url: https://docs.github.com/en/billing/reference/actions-runner-pricing
+    changelog_url: https://github.blog/changelog/2026-01-01-reduced-pricing-for-github-hosted-runners-usage/
+    fetched_at: "2026-09-11T18:40:00Z"
+    verified: true
+    # "For GitHub-hosted runners, the new Actions cloud platform charge is
+    # already included into the reduced meter price." The $0.002 is therefore
+    # informational here and is NOT added on top of the SKU rates.
+    platform_charge_per_minute: 0.002
+    platform_charge_included_in_hosted_rates: true
+    platform_charge_source_url: https://github.com/resources/insights/2026-pricing-changes-for-github-actions
+    self_hosted_per_minute: 0.0
+    self_hosted_counts_against_included_minutes: false
+    skus:
+      actions_linux_slim:   {per_minute: 0.002, os: linux,   arch: x64,   cores: 1,  tier: standard}
+      actions_linux:        {per_minute: 0.006, os: linux,   arch: x64,   cores: 2,  tier: standard}
+      actions_linux_arm:    {per_minute: 0.005, os: linux,   arch: arm64, cores: 2,  tier: standard}
+      actions_windows:      {per_minute: 0.010, os: windows, arch: x64,   cores: 2,  tier: standard}
+      actions_windows_arm:  {per_minute: 0.010, os: windows, arch: arm64, cores: 2,  tier: standard}
+      actions_macos:        {per_minute: 0.062, os: macos,   arch: any,   cores: 3,  tier: standard}
+      linux_2_core_advanced: {per_minute: 0.006, os: linux, arch: x64, cores: 2,  tier: larger}
+      linux_4_core:         {per_minute: 0.012, os: linux,   arch: x64,   cores: 4,  tier: larger}
+      linux_8_core:         {per_minute: 0.022, os: linux,   arch: x64,   cores: 8,  tier: larger}
+      linux_16_core:        {per_minute: 0.042, os: linux,   arch: x64,   cores: 16, tier: larger}
+      linux_32_core:        {per_minute: 0.082, os: linux,   arch: x64,   cores: 32, tier: larger}
+      linux_64_core:        {per_minute: 0.162, os: linux,   arch: x64,   cores: 64, tier: larger}
+      linux_96_core:        {per_minute: 0.252, os: linux,   arch: x64,   cores: 96, tier: larger}
+      windows_4_core:       {per_minute: 0.022, os: windows, arch: x64,   cores: 4,  tier: larger}
+      windows_8_core:       {per_minute: 0.042, os: windows, arch: x64,   cores: 8,  tier: larger}
+      windows_16_core:      {per_minute: 0.082, os: windows, arch: x64,   cores: 16, tier: larger}
+      windows_32_core:      {per_minute: 0.162, os: windows, arch: x64,   cores: 32, tier: larger}
+      windows_64_core:      {per_minute: 0.322, os: windows, arch: x64,   cores: 64, tier: larger}
+      windows_96_core:      {per_minute: 0.552, os: windows, arch: x64,   cores: 96, tier: larger}
+      macos_l:              {per_minute: 0.077, os: macos,   arch: x64,   cores: 12, tier: larger}
+      linux_2_core_arm:     {per_minute: 0.005, os: linux,   arch: arm64, cores: 2,  tier: larger}
+      linux_4_core_arm:     {per_minute: 0.008, os: linux,   arch: arm64, cores: 4,  tier: larger}
+      linux_8_core_arm:     {per_minute: 0.014, os: linux,   arch: arm64, cores: 8,  tier: larger}
+      linux_16_core_arm:    {per_minute: 0.026, os: linux,   arch: arm64, cores: 16, tier: larger}
+      linux_32_core_arm:    {per_minute: 0.050, os: linux,   arch: arm64, cores: 32, tier: larger}
+      linux_64_core_arm:    {per_minute: 0.098, os: linux,   arch: arm64, cores: 64, tier: larger}
+      windows_2_core_arm:   {per_minute: 0.008, os: windows, arch: arm64, cores: 2,  tier: larger}
+      windows_4_core_arm:   {per_minute: 0.014, os: windows, arch: arm64, cores: 4,  tier: larger}
+      windows_8_core_arm:   {per_minute: 0.026, os: windows, arch: arm64, cores: 8,  tier: larger}
+      windows_16_core_arm:  {per_minute: 0.050, os: windows, arch: arm64, cores: 16, tier: larger}
+      windows_32_core_arm:  {per_minute: 0.098, os: windows, arch: arm64, cores: 32, tier: larger}
+      windows_64_core_arm:  {per_minute: 0.194, os: windows, arch: arm64, cores: 64, tier: larger}
+      macos_xl:             {per_minute: 0.102, os: macos,   arch: arm64, cores: 5,  tier: larger}
+      linux_4_core_gpu:     {per_minute: 0.052, os: linux,   arch: x64,   cores: 4,  tier: gpu}
+      windows_4_core_gpu:   {per_minute: 0.102, os: windows, arch: x64,   cores: 4,  tier: gpu}
+
+  "2025":
+    name: "GitHub-hosted runner rates in effect until 2025-12-31"
+    effective_from: "2023-01-01"
+    effective_until: "2025-12-31"
+    in_effect: false
+    # Primary source: the github/docs repository at the commit that added the
+    # before/after table (2025-12-16), and the pre-rename multipliers article
+    # (2025-08-14). Both are GitHub-authored.
+    source_url: https://github.com/github/docs/blob/ce33310edb3d/content/billing/reference/actions-runner-pricing.md
+    source_url_standard: https://github.com/github/docs/blob/9075b64ffbbe/content/billing/reference/actions-minute-multipliers.md
+    fetched_at: "2026-09-11T18:40:00Z"
+    verified: true
+    platform_charge_per_minute: 0.0
+    platform_charge_included_in_hosted_rates: false
+    self_hosted_per_minute: 0.0
+    self_hosted_counts_against_included_minutes: false
+    skus:
+      actions_linux_slim:   {per_minute: 0.002, os: linux,   arch: x64,   cores: 1,  tier: standard}
+      actions_linux:        {per_minute: 0.008, os: linux,   arch: x64,   cores: 2,  tier: standard}
+      actions_linux_arm:    {per_minute: 0.005, os: linux,   arch: arm64, cores: 2,  tier: standard}
+      actions_windows:      {per_minute: 0.016, os: windows, arch: x64,   cores: 2,  tier: standard}
+      actions_windows_arm:  {per_minute: 0.010, os: windows, arch: arm64, cores: 2,  tier: standard}
+      actions_macos:        {per_minute: 0.080, os: macos,   arch: any,   cores: 3,  tier: standard}
+      linux_2_core_advanced: {per_minute: 0.008, os: linux, arch: x64, cores: 2,  tier: larger}
+      linux_4_core:         {per_minute: 0.016, os: linux,   arch: x64,   cores: 4,  tier: larger}
+      linux_8_core:         {per_minute: 0.032, os: linux,   arch: x64,   cores: 8,  tier: larger}
+      linux_16_core:        {per_minute: 0.064, os: linux,   arch: x64,   cores: 16, tier: larger}
+      linux_32_core:        {per_minute: 0.128, os: linux,   arch: x64,   cores: 32, tier: larger}
+      linux_64_core:        {per_minute: 0.256, os: linux,   arch: x64,   cores: 64, tier: larger}
+      linux_96_core:        {per_minute: 0.384, os: linux,   arch: x64,   cores: 96, tier: larger}
+      windows_4_core:       {per_minute: 0.032, os: windows, arch: x64,   cores: 4,  tier: larger}
+      windows_8_core:       {per_minute: 0.064, os: windows, arch: x64,   cores: 8,  tier: larger}
+      windows_16_core:      {per_minute: 0.128, os: windows, arch: x64,   cores: 16, tier: larger}
+      windows_32_core:      {per_minute: 0.256, os: windows, arch: x64,   cores: 32, tier: larger}
+      windows_64_core:      {per_minute: 0.512, os: windows, arch: x64,   cores: 64, tier: larger}
+      windows_96_core:      {per_minute: 0.768, os: windows, arch: x64,   cores: 96, tier: larger}
+      macos_l:              {per_minute: 0.120, os: macos,   arch: x64,   cores: 12, tier: larger}
+      linux_2_core_arm:     {per_minute: 0.005, os: linux,   arch: arm64, cores: 2,  tier: larger}
+      linux_4_core_arm:     {per_minute: 0.010, os: linux,   arch: arm64, cores: 4,  tier: larger}
+      linux_8_core_arm:     {per_minute: 0.020, os: linux,   arch: arm64, cores: 8,  tier: larger}
+      linux_16_core_arm:    {per_minute: 0.040, os: linux,   arch: arm64, cores: 16, tier: larger}
+      linux_32_core_arm:    {per_minute: 0.080, os: linux,   arch: arm64, cores: 32, tier: larger}
+      linux_64_core_arm:    {per_minute: 0.160, os: linux,   arch: arm64, cores: 64, tier: larger}
+      windows_2_core_arm:   {per_minute: 0.010, os: windows, arch: arm64, cores: 2,  tier: larger}
+      windows_4_core_arm:   {per_minute: 0.020, os: windows, arch: arm64, cores: 4,  tier: larger}
+      windows_8_core_arm:   {per_minute: 0.040, os: windows, arch: arm64, cores: 8,  tier: larger}
+      windows_16_core_arm:  {per_minute: 0.080, os: windows, arch: arm64, cores: 16, tier: larger}
+      windows_32_core_arm:  {per_minute: 0.160, os: windows, arch: arm64, cores: 32, tier: larger}
+      windows_64_core_arm:  {per_minute: 0.320, os: windows, arch: arm64, cores: 64, tier: larger}
+      macos_xl:             {per_minute: 0.160, os: macos,   arch: arm64, cores: 6,  tier: larger}
+      linux_4_core_gpu:     {per_minute: 0.070, os: linux,   arch: x64,   cores: 4,  tier: gpu}
+      windows_4_core_gpu:   {per_minute: 0.140, os: windows, arch: x64,   cores: 4,  tier: gpu}
+
+  "2026-selfhosted-announced":
+    name: "Announced-then-postponed self-hosted platform charge (scenario, NOT in effect)"
+    effective_from: null
+    in_effect: false
+    status: postponed
+    # Announced 2025-12-16 for 2026-03-01; postponed 2025-12-17: "We're
+    # postponing the announced billing change for self-hosted GitHub Actions to
+    # take time to re-evaluate our approach." No reinstatement found on
+    # docs.github.com or github.blog/changelog as of fetched_at. ciburn prices
+    # this only when explicitly asked (--model 2026-selfhosted-announced) and
+    # labels the result a scenario.
+    source_url: https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/
+    postponement_source_url: https://github.com/resources/insights/2026-pricing-changes-for-github-actions
+    fetched_at: "2026-09-11T18:40:00Z"
+    verified: true
+    inherits_skus_from: "2026"
+    platform_charge_per_minute: 0.002
+    platform_charge_included_in_hosted_rates: true
+    self_hosted_per_minute: 0.002
+    self_hosted_counts_against_included_minutes: true
+    self_hosted_public_repositories_free: true
