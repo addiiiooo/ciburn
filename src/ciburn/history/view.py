@@ -16,7 +16,6 @@ from ciburn.pricing import JobPrice, PriceModel, Pricing, RunnerClass, price_job
 from ciburn.repo_layout import RepoLayout
 from ciburn.workflow import Job, Workflow
 
-MATRIX_SUFFIX_RE = re.compile(r"\s*\((?:[^()]*|\([^()]*\))*\)\s*$")
 TERMINAL_STATUSES = {"completed"}
 
 
@@ -30,8 +29,26 @@ def parse_ts(s: str | None) -> datetime | None:
 
 
 def base_job_name(name: str) -> str:
-    """``test (ubuntu-latest, 3.11)`` -> ``test``."""
-    return MATRIX_SUFFIX_RE.sub("", name).strip() or name
+    """``test (ubuntu-latest, 3.11)`` -> ``test``.
+
+    Strips one trailing balanced parenthesised group with a linear scan (a
+    regex with nested quantifiers backtracked exponentially on names with an
+    unmatched "(").
+    """
+    stripped = name.rstrip()
+    if not stripped.endswith(")"):
+        return name
+    depth = 0
+    for i in range(len(stripped) - 1, -1, -1):
+        ch = stripped[i]
+        if ch == ")":
+            depth += 1
+        elif ch == "(":
+            depth -= 1
+            if depth == 0:
+                base = stripped[:i].rstrip()
+                return base or name
+    return name
 
 
 @dataclass

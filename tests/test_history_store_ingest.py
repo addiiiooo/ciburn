@@ -238,6 +238,13 @@ def test_helpers() -> None:
     assert base_job_name("build (a (b))") == "build"
     assert base_job_name("plain") == "plain"
     assert base_job_name("()") == "()"
+    assert base_job_name("weird (unclosed") == "weird (unclosed"
+    assert base_job_name("a (b) c") == "a (b) c"
+    import time
+
+    t0 = time.perf_counter()
+    assert base_job_name("test (" + "a" * 5000) == "test (" + "a" * 5000
+    assert time.perf_counter() - t0 < 0.5
     assert parse_ts(None) is None
     assert parse_ts("garbage") is None
     assert parse_ts("2026-01-01T00:00:00Z") == datetime(2026, 1, 1, tzinfo=UTC)
