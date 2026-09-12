@@ -91,13 +91,12 @@ output.
 Python 3.11+.
 
 ```bash
-git clone https://github.com/addiiiooo/ciburn && cd ciburn
-uv tool install .             # or: pipx install .   /   pip install .
+uvx ciburn audit --repo owner/name --days 90   # run it without installing
+uv tool install ciburn                          # or: pipx install ciburn
 ciburn --help
 ```
 
-Once the first release is on PyPI: `uv tool install ciburn`, `pipx install
-ciburn`, or `uvx ciburn`.
+From a checkout instead: `uv tool install .`
 
 ## Use
 
