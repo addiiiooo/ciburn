@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] — 2026-09-12
+
+### Fixed
+- Terminal report: below 120 columns the finding tables squeezed the finding
+  text into a dozen characters and wrapped every word onto its own line (the
+  macOS Terminal default is 80×24). The reporter now reads the console width and
+  lays findings out one block each, wrapped to the terminal, when it is narrower
+  than 120 columns; the tables remain at 120 columns and above, and now share
+  the width between their text columns instead of starving the finding column.
+- Progress output: a shorter line printed over a longer in-place counter left
+  the tail of the old one on screen (`done (50 API requests)obs)`). Counters
+  are now blanked before a permanent line, and are only written in place when
+  stderr is a terminal.
+
+### Changed
+- `docs/demo.svg` is rendered at 100 columns (`scripts/render_demo.py`
+  default), so the README shows what a default-width terminal shows.
+
 ## [0.1.0] — 2026-09-12
 
 ### Added

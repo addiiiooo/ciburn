@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ciburn"
-version = "0.1.0"
+version = "0.1.1"
 description = "Find out what your GitHub Actions CI costs and where the money is wasted, from your own run history. Offline, no LLM, no service."
 readme = "README.md"
 requires-python = ">=3.11"

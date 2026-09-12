@@ -11,7 +11,7 @@ $ ciburn audit --repo pallets/flask --days 30
 
 ![ciburn audit of pallets/flask, rendered from real output](docs/demo.svg)
 
-The image above is the real terminal output of the command, rendered to SVG by
+The image above is the real terminal output of the command at 100 columns, rendered to SVG by
 [`scripts/render_demo.py`](scripts/render_demo.py). Plain-text versions of real
 runs: [`docs/example-pallets-flask.txt`](docs/example-pallets-flask.txt) (small
 Python project, wide short matrix) and

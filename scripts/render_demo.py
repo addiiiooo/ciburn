@@ -22,7 +22,7 @@ def main() -> None:
     ap.add_argument("--repo", required=True)
     ap.add_argument("--days", type=int, default=30)
     ap.add_argument("--out", type=Path, default=Path("docs/demo.svg"))
-    ap.add_argument("--width", type=int, default=132)
+    ap.add_argument("--width", type=int, default=100)
     ap.add_argument("--max-rows", type=int, default=8)
     ap.add_argument("--offline", action="store_true")
     ap.add_argument("--cache", type=Path, default=None)

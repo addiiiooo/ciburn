@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
@@ -166,6 +167,82 @@ def test_reporters(repo_dir: Path, cache_with_history: Path) -> None:
         assert "no findings" in c2.export_text()
 
 
+def test_terminal_layout_follows_console_width(repo_dir: Path, cache_with_history: Path) -> None:
+    measured = run_audit(
+        AuditOptions(
+            path=repo_dir, repo="acme/widgets", cache=cache_with_history, offline=True, now=NOW
+        )
+    )
+    assert measured.measured
+    advisory = run_audit(AuditOptions(path=repo_dir, no_history=True, now=NOW))
+    assert advisory.advisory
+
+    def render(res: AuditResult, width: int) -> str:
+        console = Console(record=True, width=width, file=io.StringIO())
+        render_terminal(res, console)
+        return console.export_text()
+
+    # 80 (the macOS Terminal default) up to 119: one block per finding, wrapped to the console
+    for width in (80, 100, 119):
+        text = render(measured, width)
+        assert "observed: " in text
+        assert "recoverable: " in text
+        assert "confidence " in text
+        assert "recoverable (estimate)" not in text
+        assert all(len(line) <= width for line in text.splitlines()), width
+        for f in measured.measured:
+            assert f.message.split()[0] in text
+        text = render(advisory, width)
+        assert "ADVISORY — configuration only" in text
+        assert "fix: " in text
+        assert all(len(line) <= width for line in text.splitlines()), width
+    # 120 and wider: the tables, with the finding column wide enough to read
+    for width in (120, 140):
+        text = render(measured, width)
+        assert "(estimate)" in text  # the table header, possibly wrapped
+        assert "observed: " not in text
+        assert "fix: " in text
+        assert all(len(line) <= width for line in text.splitlines()), width
+        text = render(advisory, width)
+        assert "ADVISORY — configuration only" in text
+        assert all(len(line) <= width for line in text.splitlines()), width
+
+
+def test_progress_clears_transient_line_before_permanent_line() -> None:
+    from ciburn.cli import _progress
+
+    buf = io.StringIO()
+    cb = _progress(False, Console(file=buf, force_terminal=True, color_system=None, width=80))
+    cb("repo", {"full_name": "acme/widgets", "private": False})
+    cb("runs", {"seen": 100})
+    cb("runs", {"seen": 62})
+    cb("jobs", {"done": 40, "total": 62, "jobs": 148})
+    cb("done", {"requests": 50})
+    raw = buf.getvalue()
+    # replay the carriage returns the way a terminal would
+    screen: list[str] = []
+    for line in raw.split("\n"):
+        row = ""
+        for seg in line.split("\r"):
+            row = seg + row[len(seg) :]
+        screen.append(row.rstrip())
+    assert screen[:3] == ["fetching history for acme/widgets…", "  done (50 API requests)", ""]
+    assert "obs)" not in raw.replace("(148 jobs)", "")
+
+    # not a terminal (CI logs, pipes): no in-place counters at all
+    buf = io.StringIO()
+    cb = _progress(False, Console(file=buf, force_terminal=False, width=80))
+    cb("runs", {"seen": 100})
+    cb("jobs", {"done": 40, "total": 62, "jobs": 148})
+    cb("done", {"requests": 3})
+    assert buf.getvalue() == "  done (3 API requests)\n"
+
+    buf = io.StringIO()
+    cb = _progress(True, Console(file=buf, force_terminal=True, width=80))
+    cb("done", {"requests": 3})
+    assert buf.getvalue() == ""
+
+
 def test_cli_audit_static_and_formats(repo_dir: Path, tmp_path: Path) -> None:
     runner = CliRunner()
     r = runner.invoke(cli, ["audit", "--path", str(repo_dir), "--no-history"])
@@ -273,7 +350,7 @@ def test_cli_rules_models_version() -> None:
     runner = CliRunner()
     assert "H001" in runner.invoke(cli, ["rules"]).output
     assert "2026-selfhosted-announced" in runner.invoke(cli, ["models"]).output
-    assert "0.1.0" in runner.invoke(cli, ["--version"]).output
+    assert "0.1.1" in runner.invoke(cli, ["--version"]).output
 
 
 def test_detect_repo_and_overrides(tmp_path: Path) -> None:

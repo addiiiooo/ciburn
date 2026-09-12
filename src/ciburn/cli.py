@@ -8,6 +8,7 @@ from typing import Any
 
 import click
 from rich.console import Console
+from rich.text import Text
 
 from ciburn import __version__
 from ciburn.audit import AuditOptions, AuditResult, parse_label_overrides, run_audit
@@ -101,27 +102,48 @@ def _common_options(fn: Any) -> Any:
     return fn
 
 
-def _progress(quiet: bool) -> Any:
-    err = Console(stderr=True)
+def _progress(quiet: bool, err: Console | None = None) -> Any:
+    """Progress callback for ingest, writing to stderr.
+
+    Counters ("runs: 300", "jobs: run 40/62 (148 jobs)") are transient: each
+    overwrites the previous one in place with a carriage return, and only when
+    stderr is a terminal. A permanent line first blanks whatever transient text
+    is on the row, otherwise a shorter line leaves the tail of the longer one
+    behind it ("done (50 API requests)obs)").
+    """
+    err = err or Console(stderr=True)
+    transient_len = 0
+
+    def transient(text: str) -> None:
+        nonlocal transient_len
+        if not err.is_terminal:
+            return
+        pad = " " * max(0, transient_len - len(text))
+        err.print(Text(text, style="dim"), pad, sep="", end="\r")
+        transient_len = len(text)
+
+    def permanent(text: str, style: str) -> None:
+        nonlocal transient_len
+        if transient_len:
+            err.print(" " * transient_len, end="\r")
+            transient_len = 0
+        err.print(Text(text, style=style))
 
     def cb(event: str, info: dict[str, Any]) -> None:
         if quiet:
             return
         if event == "repo":
-            err.print(f"[dim]fetching history for {info['full_name']}…[/dim]")
+            permanent(f"fetching history for {info['full_name']}…", "dim")
         elif event == "runs":
-            err.print(f"[dim]  runs: {info['seen']}[/dim]", end="\r")
+            transient(f"  runs: {info['seen']}")
         elif event == "jobs":
-            err.print(
-                f"[dim]  jobs: run {info['done']}/{info['total']} ({info['jobs']} jobs)[/dim]",
-                end="\r",
-            )
+            transient(f"  jobs: run {info['done']}/{info['total']} ({info['jobs']} jobs)")
         elif event == "commits":
-            err.print(f"[dim]  commits: {info['done']}/{info['total']}[/dim]", end="\r")
+            transient(f"  commits: {info['done']}/{info['total']}")
         elif event == "log":
-            err.print(f"[yellow]{info['message']}[/yellow]")
+            permanent(info["message"], "yellow")
         elif event == "done":
-            err.print(f"[dim]  done ({info['requests']} API requests)[/dim]")
+            permanent(f"  done ({info['requests']} API requests)", "dim")
 
     return cb
 
