@@ -613,7 +613,12 @@ def render_report(s: dict[str, Any]) -> str:
         f"repositories by stars from the GitHub search API with `pushed:>={smp['pushed_since']} archived:false fork:false`. "
         "The exact query strings are in `dataset/sample.json`.",
         f"- Selected {smp['selected']} repositories; scanned {smp['scanned']}; {smp['with_workflows']} have at least one workflow file, "
-        f"{smp['without_workflows']} have none; {smp['not_scanned_or_failed']} were not scanned (scan interrupted or API error).",
+        f"{smp['without_workflows']} have none"
+        + (
+            f"; {smp['not_scanned_or_failed']} were not scanned (scan interrupted or API error)."
+            if smp["not_scanned_or_failed"]
+            else "."
+        ),
         f"- Window: the {smp['window_days']} days before each repository's scan. Per repository: all workflow files, the file tree, "
         "up to 200 runs (the API's `total_count` for the window is recorded separately), and the jobs of up to 8 runs "
         "(newest completed run of each workflow first, then newest overall).",

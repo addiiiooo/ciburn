@@ -69,6 +69,20 @@ class W005:
         return out
 
 
+def _leg_key(v: Any) -> str:
+    """Canonical string for a matrix leg; dict keys are stringified so YAML
+    keys that parse as bool/int (``on:``, ``yes:``, ``3.10:``) sort with the rest."""
+    return json.dumps(_stringify_keys(v), sort_keys=True, default=str)
+
+
+def _stringify_keys(v: Any) -> Any:
+    if isinstance(v, dict):
+        return {str(k): _stringify_keys(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_stringify_keys(x) for x in v]
+    return v
+
+
 def _duplicate_legs(matrix: dict[str, Any]) -> list[str]:
     dups: list[str] = []
     for axis, values in matrix.items():
@@ -76,7 +90,7 @@ def _duplicate_legs(matrix: dict[str, Any]) -> list[str]:
             continue
         seen: set[str] = set()
         for v in values:
-            key = json.dumps(v, sort_keys=True, default=str)
+            key = _leg_key(v)
             if key in seen:
                 dups.append(f"{axis}={v}")
             seen.add(key)
@@ -84,7 +98,7 @@ def _duplicate_legs(matrix: dict[str, Any]) -> list[str]:
     if isinstance(include, list):
         seen_inc: set[str] = set()
         for inc in include:
-            key = json.dumps(inc, sort_keys=True, default=str)
+            key = _leg_key(inc)
             if key in seen_inc:
                 dups.append(f"include={key}")
             seen_inc.add(key)

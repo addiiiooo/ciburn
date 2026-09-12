@@ -104,6 +104,14 @@ def test_duplicate_legs() -> None:
     assert _duplicate_legs({"os": "${{ fromJson(x) }}"}) == []
 
 
+def test_duplicate_legs_mixed_key_types() -> None:
+    # YAML keys such as ``on:`` / ``yes:`` parse as bool, ``3.10:`` as float;
+    # json.dumps(sort_keys=True) cannot order bool against str. Seen in the corpus.
+    legs = [{True: "x", "name": "a"}, {"name": "a", True: "x"}, {3.1: 1}]
+    assert _duplicate_legs({"include": legs}) == ['include={"True": "x", "name": "a"}']
+    assert _duplicate_legs({"os": [{True: 1, "b": 2}, "s"]}) == []
+
+
 def test_cancels_in_progress_forms() -> None:
     assert not _cancels_in_progress(None)
     assert not _cancels_in_progress("group-only")
