@@ -29,11 +29,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          python-version: "3.12"
+          # mypy targets python_version 3.11 (pyproject). On 3.12+ the lock resolves
+          # numpy 2.5, whose stubs use PEP 695 `type` statements that mypy rejects
+          # for a 3.11 target (exit 2). Lint on the minimum supported interpreter.
+          python-version: "3.11"
       - run: uv sync --group dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
@@ -44,12 +47,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
@@ -66,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
@@ -85,7 +88,7 @@ jobs:
       contents: read
       actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
